@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/build",
+  "command": "/usr/lib64/ccache/g++ -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/include -O3 -DNDEBUG -O3 -std=gnu++17 -o CMakeFiles/HPCA_PC_MLP.dir/main.cpp.o -c /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/main.cpp",
+  "file": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/main.cpp",
+  "output": "CMakeFiles/HPCA_PC_MLP.dir/main.cpp.o"
+},
+{
+  "directory": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/build",
+  "command": "/usr/lib64/ccache/g++ -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/include -O3 -DNDEBUG -O3 -std=gnu++17 -o CMakeFiles/HPCA_PC_MLP.dir/src/MLPHandler.cpp.o -c /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/src/MLPHandler.cpp",
+  "file": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/src/MLPHandler.cpp",
+  "output": "CMakeFiles/HPCA_PC_MLP.dir/src/MLPHandler.cpp.o"
+},
+{
+  "directory": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/build",
+  "command": "/usr/lib64/ccache/g++ -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/include -O3 -DNDEBUG -O3 -std=gnu++17 -o CMakeFiles/HPCA_PC_MLP.dir/src/Utils.cpp.o -c /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/src/Utils.cpp",
+  "file": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/src/Utils.cpp",
+  "output": "CMakeFiles/HPCA_PC_MLP.dir/src/Utils.cpp.o"
+}
+]

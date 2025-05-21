@@ -64,7 +64,14 @@ int main()
 
   // SIMD version
   TStopwatch timerSIMD;
-  // TODO
+  for (int ii = 0; ii < NIter; ii++)
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j += 4) {
+        fvec& vec = reinterpret_cast<fvec&>(a[i][j]);
+        reinterpret_cast<fvec&>(c_simd[i][j]) = f(vec);
+      }
+    }
+
   timerSIMD.Stop();
 
   double tScal = timerScalar.RealTime() * 1000;

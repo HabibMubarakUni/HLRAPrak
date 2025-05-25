@@ -5,7 +5,7 @@ Authors: A. Mithran; R.Lakos; I. Kulakov; M. Zyzak
 ==================================================
 */
 
-/// use "g++ -O3 -fno-tree-vectorize -msse Matrix.cpp && ./a.out" to run
+/// use "g++ -O3 -fno-tree-vectorize -msse Matrix.cpp -o 4_1.out && ./4_1.out" to run
 // Finish SIMDized version. Compare results and time.
 
 #include <stdlib.h>

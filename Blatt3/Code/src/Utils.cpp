@@ -38,7 +38,7 @@ namespace Utils
     }
   }
 
-  void Utils::MatVecMulSimd(const std::vector<std::vector<float>>& matrix,
+  void MatVecMulSimd(const std::vector<std::vector<float>>& matrix,
                           const std::vector<float>& vector,
                           std::vector<float>& result)
   {

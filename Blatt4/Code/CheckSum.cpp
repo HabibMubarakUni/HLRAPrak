@@ -4,7 +4,7 @@
 Authors: A. Mithran; I. Kulakov; M. Zyzak
 ==================================================
 */
-/// use "g++ -O3 -fno-tree-vectorize -msse CheckSum.cpp && ./a.out" to run
+/// use "g++ -O3 -fno-tree-vectorize -msse CheckSum.cpp -o 4_3.out && ./4_3.out" to run
 
 // make calculation parallel: a) using SIMD instructions, b) using usual int-instructions.
 
@@ -54,7 +54,14 @@ int main()
     unsigned char sumV = 0;
 
     TStopwatch timerSIMD;
-    // TODO
+    //! müssen wir noch iwie erklären
+    fvec* data_simd = reinterpret_cast<fvec*>(str); 
+    fvec simd_sum;
+    for (int ii = 0; ii < NIter; ii++) {
+        simd_sum = Sum<fvec>(data_simd, N/16);
+        unsigned char* simd_to_str = reinterpret_cast<unsigned char*>(&simd_sum);
+        sumV = Sum<unsigned char>(simd_to_str, 16);
+    }
     timerSIMD.Stop();
 
     /// SCALAR INTEGER
@@ -62,7 +69,13 @@ int main()
     unsigned char sumI = 0;
 
     TStopwatch timerINT;
-    // TODO
+    //! müssen wir noch iwie erklären
+    int* data_int = reinterpret_cast<int*>(str);
+    int int_sum;
+    for (int ii = 0; ii < NIter; ii++) {
+        int_sum = Sum<int>(data_int, N/4);
+        sumI = ((int_sum >> 24) ^ (int_sum >> 16) ^ (int_sum >> 8) ^ int_sum);
+    }
     timerINT.Stop();
 
     /// -- OUTPUT --

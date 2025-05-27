@@ -91,8 +91,6 @@ int main()
             __m128 cV = _mm_set_ps(c[i * fvecLen+3], c[i * fvecLen + 2],
                                    c[i * fvecLen + 1], c[i * fvecLen]);
             
-            ///__put your code here__
-
             // Berechnung von: b^2 - 4ac
             __m128 detV = _mm_sub_ps(
                 _mm_mul_ps(bV, bV),  // b^2
@@ -171,14 +169,12 @@ int main()
     TStopwatch timerSIMD4;
     for (int io = 0; io < NIterOut; io++)
         for (int i = 0; i < N; i += fvecLen) {
-            // TODO__put your code here__
-            // TODO cast coefficients b and c
+            // cast coefficients b and c
             fvec& aV = reinterpret_cast<fvec&>(a[i]);
             fvec& bV = reinterpret_cast<fvec&>(b[i]);
             fvec& cV = reinterpret_cast<fvec&>(c[i]);
 
-            // TODO__put your code here__
-            // TODO put the code, which calculates the root
+            // put the code, which calculates the root
             fvec detV = bV * bV - 4 * aV * cV;
             fvec xV = (-bV + sqrt(detV)) / (2 * aV);
 

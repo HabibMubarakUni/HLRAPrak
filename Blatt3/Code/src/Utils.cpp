@@ -38,6 +38,19 @@ namespace Utils
     }
   }
 
+  void MatVecMulSimd(const std::vector<std::vector<float>>& matrix, const std::vector<float>& vector,
+                     std::vector<float>& result) 
+  {
+    size_t n = matrix.size();
+    size_t m = vector.size();
+
+    if ((result.size() != n) ||
+      (!matrix.empty() && (matrix[0].size() != m)) ||
+      matrix.empty() && (m != 0)) {
+        throw std::invalid_argument("Größen stimmen nicht überein");
+      }
+  }
+
 
   void MatTransposeVecMul(const std::vector<std::vector<float>>& matrix, const std::vector<float>& vector,
                           std::vector<float>& result)

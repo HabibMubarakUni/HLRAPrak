@@ -31,6 +31,15 @@ namespace Utils
   void MatVecMul(const std::vector<std::vector<float>>& matrix, const std::vector<float>& vector,
                  std::vector<float>& result);
 
+  /**
+   * Matrix-vector multiplication with SIMD-vectors
+   * @param matrix std::vector<std::vector<float>> reference to matrix A
+   * @param vector std::vector<float> reference to vector b
+   * @param result std::vector<float> reference to result r
+   */
+  void MatVecMulSimd(const std::vector<std::vector<float>>& matrix, const std::vector<float>& vector,
+                     std::vector<float>& result);
+
   void MatTransposeVecMul(const std::vector<std::vector<float>>& matrix, const std::vector<float>& vector,
                           std::vector<float>& result);
 

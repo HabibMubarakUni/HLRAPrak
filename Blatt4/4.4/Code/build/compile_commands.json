@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/build",
+  "command": "/usr/lib64/ccache/g++ -I\"/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/include\" -g -std=gnu++17 -o CMakeFiles/HPCA_PC_MLP.dir/main.cpp.o -c \"/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/main.cpp\"",
+  "file": "/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/main.cpp",
+  "output": "CMakeFiles/HPCA_PC_MLP.dir/main.cpp.o"
+},
+{
+  "directory": "/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/build",
+  "command": "/usr/lib64/ccache/g++ -I\"/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/include\" -g -std=gnu++17 -o CMakeFiles/HPCA_PC_MLP.dir/src/MLPHandler.cpp.o -c \"/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/src/MLPHandler.cpp\"",
+  "file": "/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/src/MLPHandler.cpp",
+  "output": "CMakeFiles/HPCA_PC_MLP.dir/src/MLPHandler.cpp.o"
+},
+{
+  "directory": "/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/build",
+  "command": "/usr/lib64/ccache/g++ -I\"/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/include\" -g -std=gnu++17 -o CMakeFiles/HPCA_PC_MLP.dir/src/Utils.cpp.o -c \"/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/src/Utils.cpp\"",
+  "file": "/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt3/Code/src/Utils.cpp",
+  "output": "CMakeFiles/HPCA_PC_MLP.dir/src/Utils.cpp.o"
+}
+]

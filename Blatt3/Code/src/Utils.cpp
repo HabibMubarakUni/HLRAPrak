@@ -38,16 +38,47 @@ namespace Utils
     }
   }
 
-  void MatVecMulSimd(const std::vector<std::vector<float>>& matrix, const std::vector<float>& vector,
-                     std::vector<float>& result) 
+  void Utils::MatVecMulSimd(const std::vector<std::vector<float>>& matrix,
+                          const std::vector<float>& vector,
+                          std::vector<float>& result)
   {
-    size_t n = matrix.size();
-    size_t m = vector.size();
+      size_t n = matrix.size();   // Anzahl der Zeilen
+      size_t m = vector.size();   // Anzahl der Spalten
 
-    if ((result.size() != n) ||
-      (!matrix.empty() && (matrix[0].size() != m)) ||
-      matrix.empty() && (m != 0)) {
-        throw std::invalid_argument("Größen stimmen nicht überein");
+      // Überprüfen, ob die Größen der Eingaben zusammenpassen
+      if ((result.size() != n) || 
+          (!matrix.empty() && (matrix[0].size() != m)) ||
+          (matrix.empty() && (m != 0))) {
+          throw std::invalid_argument("Größen stimmen nicht überein");
+      }
+
+      const size_t fvecLen = 4;
+
+      // Für jede Zeile der Matrix
+      for (size_t i = 0; i < n; ++i) {
+          float sum = 0.0f;                    // Summe der aktuellen Zeile[i] * Spalte[i]
+
+          fvec sum_simd(0.0f); 
+          size_t j = 0;
+          // wird außerhalb defineriert um es später für die restlichen Werte zu benutzen
+          for (; j + fvecLen <= m; j += fvecLen) {
+              // Lade 4 Werte aus der Matrixzeile und dem Vektor als SIMD-Vektoren
+              // die Elemente werden nur als ein SIMD Vektor gelesen und interpretiert, 
+              // aber die originalen Daten wenn nicht modifiziert
+              const fvec& row_simd = *reinterpret_cast<const fvec*>(&matrix[i][j]);
+              const fvec& vec_simd = *reinterpret_cast<const fvec*>(&vector[j]);
+              // Multipliziere und aktualisiere die Summe
+              sum_simd = sum_simd + row_simd * vec_simd;
+          }
+          // Die 4 SIMD-Ergebnisse aufsummieren
+          sum += sum_simd[0] + sum_simd[1] + sum_simd[2] + sum_simd[3];
+
+          // Restliche Elemente (falls m nicht durch 4 teilbar) manuell berechnen
+          // j ist an der Stelle wo es beim letzten SIMD Index aufgehört hat zu rechnen
+          for (; j < m; ++j) {
+              sum += matrix[i][j] * vector[j];
+          }
+          result[i] = sum; // Ergebnis für diese Zeile speichern
       }
   }
 
@@ -103,12 +134,18 @@ namespace Utils
     // Wir wissen result ist leer, aber sie soll diese Struktur haben: mxn
     result.resize(m);
 
+    //! Hinzugefügt nach der Abgabe als Korrigierung, aber löst evtl. immer noch nicht die wrong results
+    for (j = 0; j < m; j++) {
+      result[j].clear();
+      result[j].reserve(n);
+    }
+
     // Füge die Daten transponiert in result hinzu
     for (i = 0; i < n; i++) {
       for (j = 0; j < m; j++) {
         result[j].push_back(matrix[i][j]);
       }
-    }      
+    }
   }
 
 

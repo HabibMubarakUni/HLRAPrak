@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.20"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "HPCA_PC_MLP",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "HPCA_PC_MLP::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-HPCA_PC_MLP-Debug-b7719a3ac4ba036ed2b1.json",
+					"name" : "HPCA_PC_MLP",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/build",
+		"source" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

@@ -18,6 +18,7 @@ Emails: lakos@fias.uni-frankfurt.de; mithran@fias.uni-frankfurt.de
 #include <stdexcept>
 #include <cmath>
 #include <algorithm> // für Shuffle()
+#include "P4_F32vec4.h"
 
 namespace Utils
 {

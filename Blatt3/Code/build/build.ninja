@@ -12,7 +12,7 @@
 
 # =============================================================================
 # Project: HPCA_PC_MLP
-# Configurations: Release
+# Configurations: Debug
 # =============================================================================
 
 #############################################
@@ -24,7 +24,7 @@ ninja_required_version = 1.5
 #############################################
 # Set configuration variable for custom commands.
 
-CONFIGURATION = Release
+CONFIGURATION = Debug
 # =============================================================================
 # Include auxiliary files.
 
@@ -39,7 +39,7 @@ include CMakeFiles/rules.ninja
 #############################################
 # Logical path to working directory; prefix for absolute paths.
 
-cmake_ninja_workdir = /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/build/
+cmake_ninja_workdir = /home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/build/
 # =============================================================================
 # Object build statements for EXECUTABLE target HPCA_PC_MLP
 
@@ -49,24 +49,24 @@ cmake_ninja_workdir = /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exer
 
 build cmake_object_order_depends_target_HPCA_PC_MLP: phony || .
 
-build CMakeFiles/HPCA_PC_MLP.dir/main.cpp.o: CXX_COMPILER__HPCA_PC_MLP_unscanned_Release /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/main.cpp || cmake_object_order_depends_target_HPCA_PC_MLP
+build CMakeFiles/HPCA_PC_MLP.dir/main.cpp.o: CXX_COMPILER__HPCA_PC_MLP_unscanned_Debug /home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/main.cpp || cmake_object_order_depends_target_HPCA_PC_MLP
   DEP_FILE = CMakeFiles/HPCA_PC_MLP.dir/main.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -O3 -std=gnu++17
-  INCLUDES = -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/include
+  FLAGS = -g -std=gnu++17
+  INCLUDES = -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/include
   OBJECT_DIR = CMakeFiles/HPCA_PC_MLP.dir
   OBJECT_FILE_DIR = CMakeFiles/HPCA_PC_MLP.dir
 
-build CMakeFiles/HPCA_PC_MLP.dir/src/MLPHandler.cpp.o: CXX_COMPILER__HPCA_PC_MLP_unscanned_Release /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/src/MLPHandler.cpp || cmake_object_order_depends_target_HPCA_PC_MLP
+build CMakeFiles/HPCA_PC_MLP.dir/src/MLPHandler.cpp.o: CXX_COMPILER__HPCA_PC_MLP_unscanned_Debug /home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/src/MLPHandler.cpp || cmake_object_order_depends_target_HPCA_PC_MLP
   DEP_FILE = CMakeFiles/HPCA_PC_MLP.dir/src/MLPHandler.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -O3 -std=gnu++17
-  INCLUDES = -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/include
+  FLAGS = -g -std=gnu++17
+  INCLUDES = -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/include
   OBJECT_DIR = CMakeFiles/HPCA_PC_MLP.dir
   OBJECT_FILE_DIR = CMakeFiles/HPCA_PC_MLP.dir/src
 
-build CMakeFiles/HPCA_PC_MLP.dir/src/Utils.cpp.o: CXX_COMPILER__HPCA_PC_MLP_unscanned_Release /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/src/Utils.cpp || cmake_object_order_depends_target_HPCA_PC_MLP
+build CMakeFiles/HPCA_PC_MLP.dir/src/Utils.cpp.o: CXX_COMPILER__HPCA_PC_MLP_unscanned_Debug /home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/src/Utils.cpp || cmake_object_order_depends_target_HPCA_PC_MLP
   DEP_FILE = CMakeFiles/HPCA_PC_MLP.dir/src/Utils.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -O3 -std=gnu++17
-  INCLUDES = -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/include
+  FLAGS = -g -std=gnu++17
+  INCLUDES = -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/include
   OBJECT_DIR = CMakeFiles/HPCA_PC_MLP.dir
   OBJECT_FILE_DIR = CMakeFiles/HPCA_PC_MLP.dir/src
 
@@ -78,8 +78,8 @@ build CMakeFiles/HPCA_PC_MLP.dir/src/Utils.cpp.o: CXX_COMPILER__HPCA_PC_MLP_unsc
 #############################################
 # Link the executable HPCA_PC_MLP
 
-build HPCA_PC_MLP: CXX_EXECUTABLE_LINKER__HPCA_PC_MLP_Release CMakeFiles/HPCA_PC_MLP.dir/main.cpp.o CMakeFiles/HPCA_PC_MLP.dir/src/MLPHandler.cpp.o CMakeFiles/HPCA_PC_MLP.dir/src/Utils.cpp.o
-  FLAGS = -O3 -DNDEBUG -O3
+build HPCA_PC_MLP: CXX_EXECUTABLE_LINKER__HPCA_PC_MLP_Debug CMakeFiles/HPCA_PC_MLP.dir/main.cpp.o CMakeFiles/HPCA_PC_MLP.dir/src/MLPHandler.cpp.o CMakeFiles/HPCA_PC_MLP.dir/src/Utils.cpp.o
+  FLAGS = -g
   OBJECT_DIR = CMakeFiles/HPCA_PC_MLP.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -91,7 +91,7 @@ build HPCA_PC_MLP: CXX_EXECUTABLE_LINKER__HPCA_PC_MLP_Release CMakeFiles/HPCA_PC
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/build && /usr/bin/ccmake -S/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP -B/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/build
+  COMMAND = cd /home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/build && /usr/bin/ccmake -S/home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code -B/home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/build
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -103,7 +103,7 @@ build edit_cache: phony CMakeFiles/edit_cache.util
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/build && /usr/bin/cmake --regenerate-during-build -S/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP -B/home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/build
+  COMMAND = cd /home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/build && /usr/bin/cmake --regenerate-during-build -S/home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code -B/home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/build
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -119,7 +119,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 
 #############################################
-# Folder: /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/build
+# Folder: /home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/build
 
 build all: phony HPCA_PC_MLP
 
@@ -130,14 +130,14 @@ build all: phony HPCA_PC_MLP
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/CMakeLists.txt /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/GNU-C.cmake /usr/share/cmake/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.30.8/CMakeCCompiler.cmake CMakeFiles/3.30.8/CMakeCXXCompiler.cmake CMakeFiles/3.30.8/CMakeSystem.cmake
+build build.ninja: RERUN_CMAKE | /home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/CMakeLists.txt /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/GNU-C.cmake /usr/share/cmake/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.30.8/CMakeCCompiler.cmake CMakeFiles/3.30.8/CMakeCXXCompiler.cmake CMakeFiles/3.30.8/CMakeSystem.cmake
   pool = console
 
 
 #############################################
 # A missing CMake input file is not an error.
 
-build /home/users8/wioo/s9292109/Desktop/HLRA_Codes/Blatt_3/Exercise-03_HPCA-PC_MLP/CMakeLists.txt /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/GNU-C.cmake /usr/share/cmake/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.30.8/CMakeCCompiler.cmake CMakeFiles/3.30.8/CMakeCXXCompiler.cmake CMakeFiles/3.30.8/CMakeSystem.cmake: phony
+build /home/users8/wioo/s9292109/Desktop/HLRA_Codes/blatt_4/HLRAPrak/Blatt3/Code/CMakeLists.txt /usr/share/cmake/Modules/CMakeCInformation.cmake /usr/share/cmake/Modules/CMakeCXXInformation.cmake /usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake /usr/share/cmake/Modules/CMakeGenericSystem.cmake /usr/share/cmake/Modules/CMakeInitializeConfigs.cmake /usr/share/cmake/Modules/CMakeLanguageInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInformation.cmake /usr/share/cmake/Modules/CMakeSystemSpecificInitialize.cmake /usr/share/cmake/Modules/Compiler/CMakeCommonCompilerMacros.cmake /usr/share/cmake/Modules/Compiler/GNU-C.cmake /usr/share/cmake/Modules/Compiler/GNU-CXX.cmake /usr/share/cmake/Modules/Compiler/GNU.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-C.cmake /usr/share/cmake/Modules/Platform/Linux-GNU-CXX.cmake /usr/share/cmake/Modules/Platform/Linux-GNU.cmake /usr/share/cmake/Modules/Platform/Linux-Initialize.cmake /usr/share/cmake/Modules/Platform/Linux.cmake /usr/share/cmake/Modules/Platform/UnixPaths.cmake CMakeCache.txt CMakeFiles/3.30.8/CMakeCCompiler.cmake CMakeFiles/3.30.8/CMakeCXXCompiler.cmake CMakeFiles/3.30.8/CMakeSystem.cmake: phony
 
 
 #############################################

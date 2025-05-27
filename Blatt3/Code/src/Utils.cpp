@@ -151,7 +151,8 @@ namespace Utils
                        std::vector<float>& vectorB,
                        std::vector<float>& result)
   {
-    MatVecMul(matrixA, vectorX, result);
+    // MatVecMul(matrixA, vectorX, result); // Scalar version
+    MatVecMulSimd(matrixA, vectorX, result); // SIMD SSE version
     VecAdd(result, vectorB, result);
   }
 

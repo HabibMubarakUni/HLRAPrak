@@ -5,7 +5,8 @@ CXX     = g++
 SRC     = random_access.cpp
 OUT     = random_access.out
 
-CXXFLAGS = -O3 -fno-tree-vectorize -I~/Vc/include -L~/Vc/lib ~/Vc/lib/libVc.a
+# CXXFLAGS = -O3 -fno-tree-vectorize -I~/Vc/include -L~/Vc/lib ~/Vc/lib/libVc.a
+CXXFLAGS = -O3 -fno-tree-vectorize -I/home/users8/wioo/s9292109/Vc/include -L/home/users8/wioo/s9292109/Vc/lib /home/users8/wioo/s9292109/Vc/lib/libVc.a
 
 SSEFLAGS = -msse
 AVXFLAGS = -mavx

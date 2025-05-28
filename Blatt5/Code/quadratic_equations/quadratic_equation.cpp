@@ -20,7 +20,7 @@ clang++ -O3 -msse -fno-tree-vectorize QuadraticEquationStdx_Solution.cpp -o qe.o
 
 // use stdx namespace for experimental SIMD
 namespace stdx = std::experimental;
-using float_v = stdx::native_simd<float>; //! float_v umbennenung
+using float_v = stdx::native_simd<float>;
 
 // ANSI escape codes for color output
 constexpr const char* COLOR_GREEN = "\033[32m";
@@ -29,11 +29,11 @@ constexpr const char* COLOR_RESET = "\033[0m";
 
 // SIMD vector size and alignment
 constexpr size_t VEC_SIZE = float_v::size(); 
-constexpr size_t VEC_ALIGNMENT = alignof(float_v); //! nicht sicher, ob später nötig
+constexpr size_t VEC_ALIGNMENT = alignof(float_v);
 
 // number of elements
-static constexpr size_t N = 8000000; //! also jeweils N viele a,b,c,x
-static_assert(N % VEC_SIZE == 0, "N must be a multiple of SIMD vector size"); //! man braucht nicht reste zu überprüfen
+static constexpr size_t N = 8000000;
+static_assert(N % VEC_SIZE == 0, "N must be a multiple of SIMD vector size");
 
 static constexpr size_t N_Vectors = N / VEC_SIZE;
 static constexpr size_t N_Iterations = 100;        // repeat calculations several times to reduce cache effects
@@ -89,14 +89,14 @@ struct DataSOA {
 
 struct AOSOAElement {
   // memory assignment
-  void SetMemory(float *mem) { //! mem ist ein pointer
+  void SetMemory(float *mem) {
     a = mem;
     b = mem + VEC_SIZE;
     c = mem + 2 * VEC_SIZE;
     x = mem + 3 * VEC_SIZE;
   }
 
-  // data //! das sind alles pointer
+  // data
   float* a = nullptr;
   float* b = nullptr;
   float* c = nullptr;
@@ -106,8 +106,8 @@ struct AOSOAElement {
 struct DataAOSOA {
   // constructor
   DataAOSOA(int n) {
-    data = new AOSOAElement[N_Vectors]; //! von den AOSOAElementen gibt es N_Vectors stück
-    memory = static_cast<float*>(_mm_malloc(sizeof(float) * 4 * N_Vectors * VEC_SIZE, VEC_ALIGNMENT));   // factor 4 for a,b,c,x //! memory ist selbst ein pointer
+    data = new AOSOAElement[N_Vectors];
+    memory = static_cast<float*>(_mm_malloc(sizeof(float) * 4 * N_Vectors * VEC_SIZE, VEC_ALIGNMENT));   // factor 4 for a,b,c,x
     float* mem = memory;
 
     // assign memory to each vector

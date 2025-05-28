@@ -293,7 +293,7 @@ int main() {
   std::chrono::high_resolution_clock::time_point aosoaTimerStart = std::chrono::high_resolution_clock::now();
   for (int it = 0; it < N_Iterations; ++it) {
     for (int i = 0; i < N_Vectors; i++) {
-      float_v& aVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].a)); //! Laufzeitprobleme mit g++ (läuft gut mit clang)
+      float_v& aVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].a)); //! Laufzeitprobleme mit g++ (läuft gut mit clang++)
       float_v& bVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].b));
       float_v& cVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].c));
       float_v& xVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].x));

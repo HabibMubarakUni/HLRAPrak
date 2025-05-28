@@ -134,7 +134,11 @@ namespace Utils
     // Wir wissen result ist leer, aber sie soll diese Struktur haben: mxn
     result.resize(m);
 
-    //! Hinzugefügt nach der Abgabe als Korrigierung, aber löst evtl. immer noch nicht die wrong results
+    //! Hinzugefügt nach der Abgabe als Korrigierung, löst evtl. immer noch nicht die wrong results
+    //! Beispiel: Sei result == {{1,2}, {3,4}}
+    //! Dann wäre result.resize(3) == {{1,2}, {3,4}, {}} <- also sind die inneren Vektoren nicht gecleart!
+    //! Somit muss man clear() anwenden, wenn man reserve + push_back verwenden möchte.
+    //! (Effizienter wäre dennoch resize + Indizes und nicht clear + reserve + push_back)
     for (j = 0; j < m; j++) {
       result[j].clear();
       result[j].reserve(n);

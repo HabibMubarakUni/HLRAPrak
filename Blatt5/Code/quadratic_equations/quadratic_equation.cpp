@@ -264,7 +264,7 @@ int main() {
         bVec[j] = dataAOS.data[i+j].b;
         cVec[j] = dataAOS.data[i+j].c;
       }
-      float_v xVec = (-bVec + sqrt(bVec * bVec - 4.f * aVec * cVec)) / (2.f * aVec); //! vllt std::sqrt
+      float_v xVec = (-bVec + stdx::sqrt(bVec * bVec - 4.f * aVec * cVec)) / (2.f * aVec);
       for (size_t j = 0; j < VEC_SIZE; j++) {
         dataAOS.data[i+j].x = xVec[j];
       }
@@ -281,7 +281,7 @@ int main() {
       float_v& bVec = reinterpret_cast<float_v&>(dataSOA.b[i]);
       float_v& cVec = reinterpret_cast<float_v&>(dataSOA.c[i]);
       float_v& xVec = reinterpret_cast<float_v&>(dataSOA.x[i]);
-      xVec = xVec = (-bVec + sqrt(bVec * bVec - 4.f * aVec * cVec)) / (2.f * aVec);
+      xVec = xVec = (-bVec + stdx::sqrt(bVec * bVec - 4.f * aVec * cVec)) / (2.f * aVec);
     }
 
     // Remember: In this data structure, copying data is not necessary. 
@@ -293,11 +293,11 @@ int main() {
   std::chrono::high_resolution_clock::time_point aosoaTimerStart = std::chrono::high_resolution_clock::now();
   for (int it = 0; it < N_Iterations; ++it) {
     for (int i = 0; i < N_Vectors; i++) {
-      float_v& aVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].a)); //! Probleme
+      float_v& aVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].a)); //! Laufzeitprobleme mit g++ (läuft gut mit clang)
       float_v& bVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].b));
       float_v& cVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].c));
       float_v& xVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].x));
-      xVec = xVec = (-bVec + sqrt(bVec * bVec - 4.f * aVec * cVec)) / (2.f * aVec);
+      xVec = xVec = (-bVec + stdx::sqrt(bVec * bVec - 4.f * aVec * cVec)) / (2.f * aVec);
     }
     // Remember: In this data structure, copying data is not necessary. 
     // Make use of reinterpret_cast and float_v&, but be careful with the memory layout and pointers.

@@ -12,7 +12,7 @@
 #include <cstdio>
 #include <stdlib.h>
 
-#include "Vc/Vc/Vc"
+#include "Vc/Vc" // geändert von "Vc/Vc/Vc" 
 using namespace Vc;
 
 
@@ -48,12 +48,10 @@ int main() {
   
   // gather without masking
   float_v tmp;
-  //TODO gather data with indices "index" from the array "input" into float_v tmp
   // Use void gather (const float *array, const uint_v &indexes)
 
   // begin your code here:
-
-
+  tmp.gather(input, index);
   // end of your code
   
   //check results
@@ -67,12 +65,11 @@ int main() {
 
   // gather with masking
   float_v tmp2;
-  //TODO gather data with indices "index" from the array "input" into float_v tmp2, if the value of "input" is larger than 0.5
   // Use void gather (const float *array, const uint_v &indexes, const float_m &mask)
 
   // begin your code here:
-
-
+  float_m mask = tmp > 0.5f;
+  tmp2.gather(input, index, mask);
   // end of your code
 
   //check results
@@ -96,13 +93,11 @@ int main() {
   if(ok) std::cout << "correct." << std::endl;
   else   std::cout << "WRONG." << std::endl;
   
-  //TODO create mask for values for obtained tmp values, which are larger than 0.5 and
-  //TODO put all values smaller than 0.5 from tmp to the array "output" at the places given by indices "index"
+
   // Use void scatter (float *array, const uint_v &indexes, const float_m &mask) const
 
   // begin your code here:
-
-
+  tmp.scatter(output, index, !mask);
   // end of your code
 
   //check results

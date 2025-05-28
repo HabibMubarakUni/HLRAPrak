@@ -100,7 +100,23 @@ int main()
   /// SIMD calculation using stdx
   TStopwatch timerVc;
 
-  // TODO: Implement the SIMD calculation using stdx
+  const int simdLen = stdx::native_simd<float>::size(); // Die Länge des std::experimental SIMD-Vektors
+  std::cout << "simdLen: " << simdLen << "\n" << std::endl;
+
+  for (int ii = 0; ii < NIter; ii++) {
+    for (int i = 0; i < N; i++) {
+      int j = 0;
+      for (; j + simdLen <= N; j += simdLen) { // Bedingung so gestellt, damit keine out-of-bounds-Fehler entstehen
+        stdx::native_simd<float>& aVec = reinterpret_cast<stdx::native_simd<float>&>(a[i][j]);
+        stdx::native_simd<float>& cVec = reinterpret_cast<stdx::native_simd<float>&>(c_simdVc[i][j]);
+        cVec = f(aVec);
+      }
+      // Restliche Elemente in der Zeile i manuell skalar berechnen
+      for (; j < N; j++) {
+        c_simdVc[i][j] = f(a[i][j]);
+      }
+    }
+  }
   
   timerVc.Stop();
 

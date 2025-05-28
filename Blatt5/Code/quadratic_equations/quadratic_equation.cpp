@@ -20,7 +20,7 @@ clang++ -O3 -msse -fno-tree-vectorize QuadraticEquationStdx_Solution.cpp -o qe.o
 
 // use stdx namespace for experimental SIMD
 namespace stdx = std::experimental;
-using float_v = stdx::native_simd<float>;
+using float_v = stdx::native_simd<float>; //! float_v umbennenung
 
 // ANSI escape codes for color output
 constexpr const char* COLOR_GREEN = "\033[32m";
@@ -28,12 +28,12 @@ constexpr const char* COLOR_RED = "\033[31m";
 constexpr const char* COLOR_RESET = "\033[0m";
 
 // SIMD vector size and alignment
-constexpr size_t VEC_SIZE = float_v::size();
-constexpr size_t VEC_ALIGNMENT = alignof(float_v);
+constexpr size_t VEC_SIZE = float_v::size(); 
+constexpr size_t VEC_ALIGNMENT = alignof(float_v); //! nicht sicher, ob später nötig
 
 // number of elements
-static constexpr size_t N = 8000000;
-static_assert(N % VEC_SIZE == 0, "N must be a multiple of SIMD vector size");
+static constexpr size_t N = 8000000; //! also jeweils N viele a,b,c,x
+static_assert(N % VEC_SIZE == 0, "N must be a multiple of SIMD vector size"); //! man braucht nicht reste zu überprüfen
 
 static constexpr size_t N_Vectors = N / VEC_SIZE;
 static constexpr size_t N_Iterations = 100;        // repeat calculations several times to reduce cache effects
@@ -89,14 +89,14 @@ struct DataSOA {
 
 struct AOSOAElement {
   // memory assignment
-  void SetMemory(float *mem) {
+  void SetMemory(float *mem) { //! mem ist ein pointer
     a = mem;
     b = mem + VEC_SIZE;
     c = mem + 2 * VEC_SIZE;
     x = mem + 3 * VEC_SIZE;
   }
 
-  // data
+  // data //! das sind alles pointer
   float* a = nullptr;
   float* b = nullptr;
   float* c = nullptr;
@@ -106,8 +106,8 @@ struct AOSOAElement {
 struct DataAOSOA {
   // constructor
   DataAOSOA(int n) {
-    data = new AOSOAElement[N_Vectors];
-    memory = static_cast<float*>(_mm_malloc(sizeof(float) * 4 * N_Vectors * VEC_SIZE, VEC_ALIGNMENT));   // factor 4 for a,b,c,x
+    data = new AOSOAElement[N_Vectors]; //! von den AOSOAElementen gibt es N_Vectors stück
+    memory = static_cast<float*>(_mm_malloc(sizeof(float) * 4 * N_Vectors * VEC_SIZE, VEC_ALIGNMENT));   // factor 4 for a,b,c,x //! memory ist selbst ein pointer
     float* mem = memory;
 
     // assign memory to each vector
@@ -255,7 +255,20 @@ int main() {
   // SIMD with AOS - Part 1
   std::chrono::high_resolution_clock::time_point aosTimerStart = std::chrono::high_resolution_clock::now();
   for (int it = 0; it < N_Iterations; ++it) {
-    // TODO
+    for (size_t i = 0; i < N; i += VEC_SIZE) {
+      float_v aVec;
+      float_v bVec;
+      float_v cVec;
+      for (size_t j = 0; j < VEC_SIZE; j++) {
+        aVec[j] = dataAOS.data[i+j].a;
+        bVec[j] = dataAOS.data[i+j].b;
+        cVec[j] = dataAOS.data[i+j].c;
+      }
+      float_v xVec = (-bVec + sqrt(bVec * bVec - 4.f * aVec * cVec)) / (2.f * aVec); //! vllt std::sqrt
+      for (size_t j = 0; j < VEC_SIZE; j++) {
+        dataAOS.data[i+j].x = xVec[j];
+      }
+    }
     // Remember: In this data structure, copying data is necessary due to AOS structure in memory
   }
   std::chrono::high_resolution_clock::time_point aosTimerEnd = std::chrono::high_resolution_clock::now();
@@ -263,7 +276,14 @@ int main() {
   // SIMD with SOA - Part 2
   std::chrono::high_resolution_clock::time_point soaTimerStart = std::chrono::high_resolution_clock::now();
   for (int it = 0; it < N_Iterations; ++it) {
-    // TODO
+    for (size_t i = 0; i < N; i += VEC_SIZE) {
+      float_v& aVec = reinterpret_cast<float_v&>(dataSOA.a[i]);
+      float_v& bVec = reinterpret_cast<float_v&>(dataSOA.b[i]);
+      float_v& cVec = reinterpret_cast<float_v&>(dataSOA.c[i]);
+      float_v& xVec = reinterpret_cast<float_v&>(dataSOA.x[i]);
+      xVec = xVec = (-bVec + sqrt(bVec * bVec - 4.f * aVec * cVec)) / (2.f * aVec);
+    }
+
     // Remember: In this data structure, copying data is not necessary. 
     // Make use of reinterpret_cast and float_v&.
   }
@@ -272,7 +292,13 @@ int main() {
   // SIMD with AOSOA - Part 3
   std::chrono::high_resolution_clock::time_point aosoaTimerStart = std::chrono::high_resolution_clock::now();
   for (int it = 0; it < N_Iterations; ++it) {
-    // TODO
+    for (int i = 0; i < N_Vectors; i++) {
+      float_v& aVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].a)); //! Probleme
+      float_v& bVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].b));
+      float_v& cVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].c));
+      float_v& xVec = reinterpret_cast<float_v&>(*(dataAOSOA.data[i].x));
+      xVec = xVec = (-bVec + sqrt(bVec * bVec - 4.f * aVec * cVec)) / (2.f * aVec);
+    }
     // Remember: In this data structure, copying data is not necessary. 
     // Make use of reinterpret_cast and float_v&, but be careful with the memory layout and pointers.
   }

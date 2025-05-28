@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "bit": "cpp",
+        "chrono": "cpp",
+        "cmath": "cpp",
+        "list": "cpp",
+        "functional": "cpp",
+        "random": "cpp",
+        "format": "cpp",
+        "limits": "cpp",
+        "tuple": "cpp",
+        "variant": "cpp"
+    }
+}

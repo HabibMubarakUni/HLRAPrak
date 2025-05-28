@@ -102,6 +102,19 @@ int main()
 
   const int simdLen = stdx::native_simd<float>::size(); // Die Länge des std::experimental SIMD-Vektors
   std::cout << "simdLen: " << simdLen << "\n" << std::endl;
+  //! temp notizen für PDF:
+  //! -----------------------------------------------
+  //! Ergebnisse:
+  //! simdLen: 4
+  //!
+  //! Time scalar:  86.313 ms 
+  //! Time headers: 21.075 ms, speed up 4.09551
+  //! Time stdx:      21.059 ms, speed up 4.09862
+  //! SIMD and scalar results are the same.
+  //! SIMD and scalar results are the same.
+  //! -----------------------------------------------
+  //! Da simdLen == 4 und N == 1000 durch 4 teilbar => kein Rest
+  //! Identisch zur Laufzeit von fvec, da die Längen identisch sind
 
   for (int ii = 0; ii < NIter; ii++) {
     for (int i = 0; i < N; i++) {

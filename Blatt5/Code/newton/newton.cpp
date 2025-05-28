@@ -71,25 +71,29 @@ float FindRootScalar(const float& p1, const float& p2) {
  */
 stdx::simd<float> FindRootVectorized(const stdx::simd<float>& p1, const stdx::simd<float>& p2) 
 {
-  // TODO: Write the vectorized code to find the root using stdx::simd
   stdx::simd<float> x = 1.0f, x_new = 0.0f;
 
-  // // mit n = 1000 Iterationen
+  // // mit n = 1000 Iterationen:
   // const size_t n_iter = 1000;
   // for (size_t i = 0; i < n_iter; i++) {
   //   x = x_new;
   //   x_new = x - F(x, p1, p2) / Fd(x, p1, p2);
   // }
 
-  // mit Masken
-  stdx::simd_mask<float> ongoing = stdx::simd_mask<float>(true); //! All lanes active at start
-  while (stdx::any_of(ongoing)) {
-    stdx::where(ongoing, x) = x_new; //! Only update lanes that are still active
+  // mit Masken:
+  // Am Anfang sind keine der Approximationen präzise genug, also sind alle auf true gesetzt
+  stdx::simd_mask<float> ongoing = stdx::simd_mask<float>(true);
+
+  // solang es noch Approximationen gibt, die nicht präzise genug sind
+  for (; stdx::any_of(ongoing);) {
+
+    // Alle Approximationen, die noch nicht präzise genug sind (also true), werden aktualisiert
+    stdx::where(ongoing, x) = x_new;
+
     x_new = x - F(x, p1, p2) / Fd(x, p1, p2);
 
-    //! Compute convergence mask for each lane
-    stdx::simd<float> difference = stdx::abs((x_new - x) / x_new);
-    ongoing = difference > PRECISION;
+    // Maske wird aktualisiert. Approximationen die jetzt präzise genug sind, werden auf false gestellt.
+    ongoing = stdx::abs((x_new - x) / x_new) > PRECISION;
   }
 
   return x_new;
@@ -162,10 +166,9 @@ int main() {
   float root2[N];
 
   // Copy input using copy_from
-  // TODO copy the data to par1_v and par2_v (fertig wahrscheinlich)
   for (int i = 0; i < Nv; ++i) {
-      par1_v[i].copy_from(&par1[i * stdx::simd<float>::size()], stdx::element_aligned_tag{});
-      par2_v[i].copy_from(&par2[i * stdx::simd<float>::size()], stdx::element_aligned_tag{});
+      par1_v[i].copy_from(&par1[i * stdx::simd<float>::size()], stdx::element_aligned);
+      par2_v[i].copy_from(&par2[i * stdx::simd<float>::size()], stdx::element_aligned);
   }
 
   // Compute the roots
@@ -176,9 +179,8 @@ int main() {
   timer.Stop();
 
   // Copy output using copy_to
-  // TODO copy the data back to root2 (fertig wahrscheinlich)
   for (int i = 0; i < Nv; ++i) {
-      root_v[i].copy_to(&root2[i * stdx::simd<float>::size()], stdx::element_aligned_tag{});
+      root_v[i].copy_to(&root2[i * stdx::simd<float>::size()], stdx::element_aligned);
   }
 
   std::cout << "SIMD part:" << std::endl;

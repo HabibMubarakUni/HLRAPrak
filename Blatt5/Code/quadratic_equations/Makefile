@@ -1,7 +1,7 @@
 # Makefile for SIMD demo (AVX/SSE)
 
 # Set your C++ compiler here
-CXX     = g++
+CXX     = clang++
 SRC     = quadratic_equation.cpp
 OUT     = quadratic_equation.out
 

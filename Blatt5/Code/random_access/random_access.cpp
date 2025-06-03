@@ -12,7 +12,7 @@
 #include <cstdio>
 #include <stdlib.h>
 
-#include "Vc/Vc" // geändert von "Vc/Vc/Vc" 
+#include "../Vc/Vc/Vc" 
 using namespace Vc;
 
 

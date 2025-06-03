@@ -1,77 +1,96 @@
 /**
- * @authors: O. Tyagi; R. Lakos; I.Kulakov; M.Zyzak
- * Exercise: Finish the vectorized version using the std::experimental SIMD library.
- * Reference: https://en.cppreference.com/w/cpp/experimental/simd
+ * C++ implementation of the Newton's method to find the root of a polynomial function
+ * http://en.wikipedia.org/wiki/Newton's_method
+ * @authors: R. Lakos; A. Mithran; O. Tyagi;
+ * Reference : https://en.cppreference.com/w/cpp/experimental/simd
  *
- * To compile and run this code, you can use: <Compiler> Newton.cpp -O3 -fno-tree-vectorize -msse -o Newton.out && ./Newton.out
+ * Please use "make run-sse" or "make run-avx" to compile and run this code using SSE or AVX instructions respectively.
  */
 
-#include <iostream>
 #include <experimental/simd>
-
-#include <stdlib.h>
-
-#include "../fvec/P4_F32vec4.h"
-#include "../utils/TStopWatch.h"
-
-
 namespace stdx = std::experimental;
 
+#include <chrono>
+#include <iostream>
 
+// type aliases for chrono types for shorter usage
+using steady_clock = std::chrono::steady_clock;
+using time_point = std::chrono::time_point<std::chrono::steady_clock>;
+using duration = std::chrono::duration<double>;
+
+// constants and aligned data arrays
 const int N = 100000;
-
-const float PRECISION = 1e-5;
-
-float par1[N] __attribute__((aligned(16)));
-float par2[N] __attribute__((aligned(16)));
+float par1[N], par2[N] __attribute__((aligned(16)));
 float root[N] __attribute__((aligned(16)));
+const float P = 1e-5f;
 
+// ========================================================= Helper functions for SIMD operations =========================================================
 
-/*
- * Function template to calculate f(x) = p1*x^3 + p2*x^2 + 6*x + 80
+/**
+ * Function to find the maximum of a SIMD vector and a scalar value.
  */
-template <class T>
-T F(const T& x, const T& p1, const T& p2) 
-{
-  const T x2 = x * x;
-  const T x3 = x2 * x;
-
-  return p1 * x3 + p2 * x2 + 6 * x + 80;
+template <typename T>
+stdx::simd<T> simd_max(const stdx::simd<T>& a, const T& b) {
+  stdx::simd<T> result = stdx::simd<T>(b);
+  stdx::where(a > b, result) = a;
+  return result;
 }
 
+/**
+ * Function to find the maximum of two SIMD vectors.
+ */
+template <typename T>
+stdx::simd<T> simd_max(const stdx::simd<T>& a, const stdx::simd<T>& b) {
+  stdx::simd<T> result = b;
+  stdx::where(a > b, result) = a;
+  return result;
+}
 
-/*
- * Function template to calculate the derivative: f'(x) = 3*p1*x^2 + 2*p2*x + 6
+// ========================================================= Polynomial and its derivative =========================================================
+
+/**
+ * Polynomial function F(x) = p1 * x^3 + p2 * x^2 + 6 * x + 80
+ * where p1 and p2 are parameters.
+ */
+template <class T>
+T F(const T& x, const T& p1, const T& p2) {
+  T x2 = x * x;
+  return p1 * x2 * x + p2 * x2 + 6 * x + 80;
+}
+
+/**
+ * Derivative of the polynomial F(x) = p1 * x^3 + p2 * x^2 + 6 * x + 80 -> Fd(x) = 3 * p1 * x^2 + 2 * p2 * x + 6
+ * where p1 and p2 are parameters.
  */
 template <class T>
 T Fd(const T& x, const T& p1, const T& p2) {
-  const T x2 = x * x;
-
-  return 3 * p1 * x2 + 2 * p2 * x + 6;
+  return 3 * p1 * x * x + 2 * p2 * x + 6;
 }
 
 
-/*
- * Function to find the root of the function f(x) = p1*x^3 + p2*x^2 + 6*x + 80
+// ========================================================= Root finding functions =========================================================
+
+/**
+ * Function to find the root of the polynomial F using Newton's method.
  */
 float FindRootScalar(const float& p1, const float& p2) {
-  float x = 1, x_new = 0;
+  float x = 1.f;
+  float x_new = x - F(x, p1, p2) / Fd(x, p1, p2);
 
-  for (; abs((x_new - x) / x_new) > PRECISION;) {
+  while (std::abs(x_new - x) > P * std::max(std::abs(x), 1.f)) {
     x = x_new;
     x_new = x - F(x, p1, p2) / Fd(x, p1, p2);
   }
-
   return x_new;
 }
 
-
-/*
- * Function to find the root of the function f(x) = p1*x^3 + p2*x^2 + 6*x + 80 using SIMD
+/**
+ * Function to find the root of the polynomial F using SIMD version of Newton's method.
  */
-stdx::simd<float> FindRootVectorized(const stdx::simd<float>& p1, const stdx::simd<float>& p2) 
-{
-  stdx::simd<float> x = 1.0f, x_new = 0.0f;
+
+stdx::simd<float> FindRootVector(const stdx::simd<float>& p1, const stdx::simd<float>& p2) {
+  stdx::simd<float> x = 1.f;
+  stdx::simd<float> x_new = x - F(x, p1, p2) / Fd(x, p1, p2);
 
   // // mit n = 1000 Iterationen:
   // const size_t n_iter = 1000;
@@ -81,120 +100,101 @@ stdx::simd<float> FindRootVectorized(const stdx::simd<float>& p1, const stdx::si
   // }
 
   // mit Masken:
-  // Am Anfang sind keine der Approximationen präzise genug, also sind alle auf true gesetzt
-  stdx::simd_mask<float> ongoing = stdx::simd_mask<float>(true);
-
-  // solang es noch Approximationen gibt, die nicht präzise genug sind
-  for (; stdx::any_of(ongoing);) {
-
-    // Alle Approximationen, die noch nicht präzise genug sind (also true), werden aktualisiert
-    stdx::where(ongoing, x) = x_new;
-
-    x_new = x - F(x, p1, p2) / Fd(x, p1, p2);
-
-    // Maske wird aktualisiert. Approximationen die jetzt präzise genug sind, werden auf false gestellt.
-    ongoing = stdx::abs((x_new - x) / x_new) > PRECISION;
+  stdx::simd_mask<float> mask = stdx::abs(x_new - x) > P * simd_max(stdx::abs(x), stdx::simd<float>(1.f));
+  while (stdx::any_of(mask)) {
+    stdx::where(mask, x) = x_new; // Diese Zeile musste geändert werden
+    stdx::where(mask, x_new) = x - F(x, p1, p2) / Fd(x, p1, p2);
+    mask = stdx::abs(x_new - x) > P * simd_max(stdx::abs(x), stdx::simd<float>(1.f));
   }
+
 
   return x_new;
 }
 
+// ========================================================= Result checking functions =========================================================
 
-/*
- * Function to check the results
+/**
+ * Function to check the results of the scalar root finding.
  */
 bool CheckResults(float* r) {
   bool ok = true;
-
   for (int i = 0; i < N; ++i) {
-    ok &= fabs(F(root[i], par1[i], par2[i]) / Fd(root[i], par1[i], par2[i])) < PRECISION;
+    ok &= std::fabs(F(root[i], par1[i], par2[i]) / Fd(root[i], par1[i], par2[i])) < P;
   }
-
   return ok;
-};
+}
 
-
-/*
- * Function to compare the results
+/**
+ * Function to compare the results of scalar and SIMD root finding.
  */
 bool CompareResults(float* r1, float* r2) {
   bool ok = true;
   for (int i = 0; i < N; ++i) {
-    ok &= fabs(r1[i] - r2[i]) < 1e-7;
+    ok &= std::fabs(r1[i] - r2[i]) < 1e-7;
   }
   return ok;
-};
+}
 
+// ========================================================= Main function =========================================================
 
-
-/*
- * Main function including all function calls
- */
 int main() {
-  // Fill parameter arrays with random numbers
+  // set random parameter values
   for (int i = 0; i < N; ++i) {
-    par1[i] = 1 + double(rand()) / double(RAND_MAX);
-    par2[i] = double(rand()) / double(RAND_MAX);
+    par1[i] = 1 + double(rand()) / double(RAND_MAX);  // from 1 to 2
+    par2[i] = double(rand()) / double(RAND_MAX);      // from 0 to 1
   }
 
-  // Scalar calculation
-  TStopwatch timer;
-
+  // scalar part
+  time_point startS = steady_clock::now();
   for (int i = 0; i < N; ++i) {
     root[i] = FindRootScalar(par1[i], par2[i]);
   }
-
-  timer.Stop();
+  time_point endS = steady_clock::now();
+  duration elapsedS = endS - startS;
 
   std::cout << "Scalar part:" << std::endl;
-
   if (CheckResults(root))
     std::cout << "Results are correct!" << std::endl;
   else
     std::cout << "Results are INCORRECT!" << std::endl;
+  std::cout << "Time: " << elapsedS.count() * 1000 << " ms" << std::endl;
+  float timeS = static_cast<float>(elapsedS.count());
 
-  std::cout << "Time: " << timer.RealTime() * 1000 << " ms " << std::endl;
-  
-  float timeScalar = timer.RealTime();
-
-  // SIMD calculation using stdx::simd
+  /// SIMD part
 
   const int Nv = N / stdx::simd<float>::size();
-  stdx::simd<float> par1_v[Nv];
-  stdx::simd<float> par2_v[Nv];
+  stdx::simd<float> par1_v[Nv], par2_v[Nv];
   stdx::simd<float> root_v[Nv];
   float root2[N];
 
-  // Copy input using copy_from
+  // copy input to SIMD vectors
   for (int i = 0; i < Nv; ++i) {
       par1_v[i].copy_from(&par1[i * stdx::simd<float>::size()], stdx::element_aligned);
       par2_v[i].copy_from(&par2[i * stdx::simd<float>::size()], stdx::element_aligned);
   }
 
-  // Compute the roots
-  timer.Start();
+  // compute with SIMD
+  time_point startV = steady_clock::now();
   for (int i = 0; i < Nv; ++i) {
-    root_v[i] = FindRootVectorized(par1_v[i], par2_v[i]);
+    root_v[i] = FindRootVector(par1_v[i], par2_v[i]);
   }
-  timer.Stop();
+  time_point endV = steady_clock::now();
+  duration elapsedV = endV - startV;
 
-  // Copy output using copy_to
+  // copy output from SIMD vectors
   for (int i = 0; i < Nv; ++i) {
       root_v[i].copy_to(&root2[i * stdx::simd<float>::size()], stdx::element_aligned);
   }
 
   std::cout << "SIMD part:" << std::endl;
-
   if (CompareResults(root, root2))
     std::cout << "Results are the same!" << std::endl;
   else
     std::cout << "Results are NOT the same!" << std::endl;
+  std::cout << "Time: " << elapsedV.count() * 1000 << " ms" << std::endl;
+  float timeV = static_cast<float>(elapsedV.count());
 
-  std::cout << "Time: " << timer.RealTime() * 1000 << " ms " << std::endl;
-  
-  float timeVectorized = timer.RealTime();
-
-  std::cout << "Speed up: " << timeScalar / timeVectorized << std::endl;
+  std::cout << "Speed up: " << timeS / timeV << std::endl;
 
   // Der Code ab hier ist neu hinzugefügt
   float max_difference = 0;
@@ -209,6 +209,7 @@ int main() {
     }
   }
   std::cout << "\nThe max difference is: " << max_difference << std::endl;
+
 
   return 0;
 }

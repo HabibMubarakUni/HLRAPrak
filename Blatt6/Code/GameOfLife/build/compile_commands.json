@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build",
+  "command": "/usr/lib64/ccache/g++ -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations/../includes -O3 -DNDEBUG -O3 -fopenmp -o CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp.o -c /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp",
+  "file": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp",
+  "output": "CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp.o"
+},
+{
+  "directory": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build",
+  "command": "/usr/lib64/ccache/g++ -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations/../includes -O3 -DNDEBUG -O3 -fopenmp -o CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp.o -c /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp",
+  "file": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp",
+  "output": "CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp.o"
+},
+{
+  "directory": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build",
+  "command": "/usr/lib64/ccache/g++ -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations/../includes -O3 -DNDEBUG -O3 -fopenmp -o CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp.o -c /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp",
+  "file": "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp",
+  "output": "CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp.o"
+}
+]

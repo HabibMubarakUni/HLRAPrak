@@ -24,26 +24,26 @@ int main()
   std::vector<float> input(n), output_scalar(n), output_parallel(n);
 
   for (int i = 0; i < n; ++i) {
-    input[i] = static_cast<float>(rand()) / RAND_MAX;
+    input[i] = static_cast<float>(rand()) / RAND_MAX; // jedem input[i] wurde eine zufällige Zahl zugewiesen
   }
 
   float sum = 0.0f;
 
   for (int i = 0; i < n; ++i) {
-    sum += input[i];
+    sum += input[i]; // Summe der zufälligen Zahl berechnet
   }
   for (int i = 0; i < n; ++i) {
-    output_scalar[i] = input[i] / sum;
+    output_scalar[i] = input[i] / sum; // Anteil berechnet
   }
 
   sum = 0.0f;
 
-  #pragma omp parallel firstprivate(n) num_threads(N_THREADS)
+  #pragma omp parallel firstprivate(n) num_threads(N_THREADS) // jeder Thread hat den Wert n=1000, wegen firstprivate
   {
-    #pragma omp for nowait
+    #pragma omp for // nowait -> Kein Warten nach for-loop! Andere Threads können hier sofort weitermachen
     for (int i = 0; i < n; ++i) {
       #pragma omp atomic
-      sum += input[i];
+      sum += input[i]; // nur diese Zeile wird nicht parallelisiert
     }
 
     #pragma omp for

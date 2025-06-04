@@ -5,8 +5,8 @@ This program will numerically compute the integral of
 
 from 0 to 1. The value of this integral is pi -- which is great since it provides an easy way to check the solution.
 
-To compile and run your code, please use:
-<Compiler> Pi.cpp -o Pi.out -O3 -fopenmp && ./Pi.out
+To compile and run your code, please use (can also use other compiler):
+g++ Pi.cpp -o Pi.out -O3 -fopenmp && ./Pi.out
 */
 
 #include <iostream>
@@ -113,8 +113,23 @@ Method 2: Calculate Pi using thread-local sums
  */
 double calculatePiThreadSums() 
 {
-    // TODO: Implement thread-local sums method to calculate Pi
-    return 0.;
+    double sum = 0.0;
+    
+    #pragma omp parallel 
+    {
+        double local_sum = 0.0; // jeder Thread hat jeweils eine Kopie von local_sum
+
+        #pragma omp for // Berechnung wird hier mit den Threads parallelisiert
+        for (size_t i = 1; i <= NUM_STEPS; ++i) {
+            double x = (i - 0.5) * STEP;
+            local_sum += 4.0 / (1.0 + x * x);
+        }
+        // implizite Barriere
+        #pragma omp atomic // local_sum aller Threads werden sequentiell zusammen addiert
+        sum += local_sum; 
+    }
+
+    return STEP * sum;
 }
 
 /**
@@ -122,8 +137,15 @@ Method 3: Calculate Pi using OpenMP reduction
  */
 double calculatePiReduction() 
 {
-    // TODO: Implement OpenMP reduction method to calculate Pi
-    return 0.;
+    double sum = 0.0;
+
+    #pragma omp parallel for reduction(+:sum) // sum Werte aller Threads zusammengerechnet
+    for (size_t i = 1; i <= NUM_STEPS; ++i) {
+        double x = (i - 0.5) * STEP;
+        sum += 4.0 / (1.0 + x * x);
+    }
+    // implizite Barriere
+    return STEP * sum;
 }
 
 /**

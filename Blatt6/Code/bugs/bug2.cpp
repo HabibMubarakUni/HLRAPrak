@@ -29,13 +29,18 @@ int main()
     output_scalar[i] = static_cast<float>(tmp) / i;
   }
 
+  float tmp_sum[n-1]; 
   tmp = 0;
+  for (int i = 1; i < n; ++i) {
+    tmp += i;
+    tmp_sum[i-1] = tmp; // sequentiell berechnet für jedes i 
+  }
+
   #pragma omp parallel num_threads(N_THREADS)
   {
     #pragma omp for
     for (int i = 1; i < n; ++i) {
-        tmp += i;
-        output_parallel[i] = static_cast<float>(tmp) / i;
+        output_parallel[i] = static_cast<float>(tmp_sum[i-1]) / i; // parallel über N_THREADS berechnet
     }
   }
 

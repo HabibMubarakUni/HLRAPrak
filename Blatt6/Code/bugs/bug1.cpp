@@ -27,7 +27,7 @@ int main()
     input[i] = static_cast<float>(rand()) / RAND_MAX;
   }
 
-  #pragma omp parallel private(n) num_threads(N_THREADS)
+  #pragma omp parallel private(n) num_threads(N_THREADS) // Zeile davor: #pragma omp parallel private(n) num_threads(N_THREADS)
   {
     #pragma omp for
     for (int i = 0; i < n; ++i) {

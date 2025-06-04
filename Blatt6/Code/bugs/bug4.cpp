@@ -16,7 +16,7 @@
 
 
 constexpr int N_THREADS = 4;
-
+// berechnet die Summe aller Werte aus input
 void CalculateSum(const std::vector<float>& input, int start, int end, float& sum) {
   for (int i = start; i < end; ++i) {
     sum += input[i];
@@ -30,14 +30,14 @@ int main()
   std::vector<float> input(n), output_scalar(n), output_parallel(n);
 
   for (int i = 0; i < n; ++i) {
-    input[i] = static_cast<float>(rand()) / RAND_MAX;
+    input[i] = static_cast<float>(rand()) / RAND_MAX; // random Zahlen in input
   }
 
   float sum = 0.0f;
   CalculateSum(input, 0, n, sum);
 
   for (int i = 0; i < n; ++i) {
-    output_scalar[i] = input[i] / sum;
+    output_scalar[i] = input[i] / sum; // Anteil der input[i]
   }
 
   sum = 0.0f;
@@ -54,10 +54,12 @@ int main()
     }
 
     float local_sum = 0.0f;
-    CalculateSum(input, start, end, local_sum);
+    CalculateSum(input, start, end, local_sum); // wird parallelisiert
 
     #pragma omp atomic
-    sum += local_sum;
+    sum += local_sum; // nicht parallelisiert
+
+    #pragma omp barrier // Barrier muss eingebaut werden, da keine implizite Synchro. stattfindet 
 
     #pragma omp for
     for (int i = 0; i < n; ++i) {

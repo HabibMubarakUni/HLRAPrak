@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Release-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.27"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Release",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "GameOfLife",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "GameOfLife::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-GameOfLife-Release-f1d2a817a50beb6df175.json",
+					"name" : "GameOfLife",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build",
+		"source" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

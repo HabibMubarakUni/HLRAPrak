@@ -1,8 +1,8 @@
 /*
 Parallelized matrix computations.
 
-To compile and run your source code, please use:
-<Compiler> Matrix.cpp -o Matrix.out -O3 -fno-tree-vectorize -msse -fopenmp -I~/Vc/include -L~/Vc/lib ~/Vc/lib/libVc.a && ./Matrix.out
+To compile and run your source code, please use (other compilers work too):
+g++ Matrix.cpp -o Matrix.out -O3 -fno-tree-vectorize -msse -fopenmp -I~/Vc/include -L~/Vc/lib ~/Vc/lib/libVc.a && ./Matrix.out
 */
 
 #include <iostream>
@@ -92,7 +92,34 @@ int main(int argc, char** argv)
   // TODO: OpenMP + SIMD computation
   TStopwatch timerOMP;
   for (int ii = 0; ii < NIter; ++ii) {
-    
+    constexpr size_t NUM_THREADS = 4;
+    # pragma omp parallel for num_threads(NUM_THREADS)
+    for (int i = 0; i < N; i++) {
+      for (int j = 0; j < N; j += Vc::float_v::Size) {
+        Vc::float_v& aVec = reinterpret_cast<Vc::float_v&>(a[i][j]);
+        Vc::float_v& cVec = reinterpret_cast<Vc::float_v&>(c_omp[i][j]);
+        cVec = Vc::sqrt(aVec);
+
+      }
+    }
+    // #pragma omp parallel
+    // {
+    //   int id = omp_get_thread_num();
+    //   int num_threads = omp_get_num_threads();
+    //   int start = id * N / num_threads;
+    //   int end = (id + 1) * N / num_threads;
+  
+    //   if (id == num_threads - 1) {
+    //     end = N;
+    //   }
+    //   for (int i = start; i < end; i++) {
+    //     for (int j = 0; j < N; j += Vc::float_v::Size) {
+    //       Vc::float_v& aVec = reinterpret_cast<Vc::float_v&>(a[i][j]);
+    //       Vc::float_v& cVec = reinterpret_cast<Vc::float_v&>(c_omp[i][j]);
+    //       cVec = Vc::sqrt(aVec);
+    //     }
+    //   }
+    // }
   }
   timerOMP.Stop();
 

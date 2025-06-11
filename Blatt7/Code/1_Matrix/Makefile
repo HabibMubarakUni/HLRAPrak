@@ -9,7 +9,7 @@ VC_LIB = $(HOME)/Vc/lib
 
 # Compiler and flags
 CXX = clang++
-CXXFLAGS = -O3 -fno-tree-vectorize -msse -I$(TBB_INCLUDE) -I$(VC_INCLUDE)
+CXXFLAGS = -O3 -fno-tree-vectorize -msse -fopenmp -I$(TBB_INCLUDE) -I$(VC_INCLUDE)
 
 # Source and target
 SRC = matrix.cpp

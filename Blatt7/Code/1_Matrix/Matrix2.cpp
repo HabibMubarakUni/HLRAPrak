@@ -9,6 +9,7 @@
 #include "../utils/TStopwatch.h"
 #include "../Vc/Vc/Vc"
 
+#include <omp.h>
 
 const int N = 1000; // matrix size. Has to be dividable by 4.
 
@@ -16,7 +17,7 @@ const int NIter = 100; // repeat calculations many times in order to neglect mem
 
 float a[N][N] __attribute__ ((aligned(16)));
 float c[N][N] __attribute__ ((aligned(16)));
-float c_simd[N][N] __attribute__ ((aligned(16)));
+float c_omp[N][N] __attribute__ ((aligned(16)));
 float c_tbb[N][N] __attribute__ ((aligned(16)));
 
 
@@ -81,19 +82,7 @@ int main() {
       }
     }
   timerScalar.Stop();
-  
-  // Vc version
-  TStopwatch timerVc;
-  for( int ii = 0; ii < NIter; ii++ )
-    for( int i = 0; i < N; i++ ) {
-      for( int j = 0; j < N; j+=Vc::float_v::Size ) {
-          Vc::float_v &aVec = (reinterpret_cast<Vc::float_v&>(a[i][j]));
-          Vc::float_v &cVec = (reinterpret_cast<Vc::float_v&>(c_simd[i][j]));
-          cVec = f(aVec);
-      }
-    }
-  timerVc.Stop();
-  
+
   // TODO: Implement a TBB + Vc Version here:
   TStopwatch timerITBB;
   for( int ii = 0; ii < NIter; ii++ )
@@ -103,16 +92,33 @@ int main() {
   }
   timerITBB.Stop();
   
+  
+  // OpenMP+Vc version
+  TStopwatch timerOmp;
+  for( int ii = 0; ii < NIter; ii++ ){
+      #pragma omp parallel for num_threads(NUM_THREADS)
+      for( int i = 0; i < N; i++ ) {
+          for( int j = 0; j < N; j+=Vc::float_v::Size ) {
+              Vc::float_v &aVec = (reinterpret_cast<Vc::float_v&>(a[i][j]));
+              Vc::float_v &cVec = (reinterpret_cast<Vc::float_v&>(c_omp[i][j]));
+              cVec = f(aVec);
+            }
+        }
+    }
+    timerOmp.Stop();
+    
+    
+    
   double tScal = timerScalar.RealTime() * 1000;
-  double tVc = timerVc.RealTime() * 1000;
+  double tOmp = timerOmp.RealTime() * 1000;
   double tITBB = timerITBB.RealTime() * 1000;
   
   std::cout << "Time scalar:     " << tScal << " ms " << std::endl;
-  std::cout << "Time Vc:         " << tVc << " ms, speedup factor: " << tScal/tVc << std::endl;
+  std::cout << "Time OpenMP:     " << tOmp << " ms, speedup factor: " << tScal/tOmp << std::endl;
   std::cout << "Time timerITBB:  " << tITBB << " ms, speedup factor: " << tScal/tITBB << std::endl;
   
-  std::cout << "Vc: " << std::endl;
-  CheckResults(c,c_simd);
+  std::cout << "OpenMP: " << std::endl;
+  CheckResults(c,c_omp);
 
   std::cout << "TBB: " << std::endl;
   CheckResults(c,c_tbb);

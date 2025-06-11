@@ -16,8 +16,9 @@ using namespace tbb;
 const int N = 2000000;
 
 int counter = 0;
-int counterParA; // TODO: Check required data type for parallelization using atomic
+std::atomic<int> counterParA(0); // TODO: Check required data type for parallelization using atomic
 int counterParM; // TODO: Check required data type for parallelization using mutex
+spin_mutex mutex; // added global mutex
 
 
 int ComplicatedFunction( float x ){ // just to simulate some time-consuming calculations, which can be parallelized
@@ -31,6 +32,12 @@ class ApplyTBBA{
 public:
   void operator()(const blocked_range<long unsigned int> &range, int cpuId = -1) const {
     // TODO parallelization via atomic
+    const float  * const a_ptr = a;
+    for(int i=range.begin(); i!=range.end(); ++i) {
+      if (ComplicatedFunction(a_ptr[i]) == 0) {
+        counterParA.fetch_add(1, std::memory_order_relaxed);
+      }
+    }
   }
 
   ApplyTBBA(const float * const a_):a(a_){}
@@ -43,8 +50,13 @@ class ApplyTBBM{
   
 public:
   void operator()(const blocked_range<long unsigned int> &range, int cpuId = -1) const {
+    const float  * const a_ptr = a;    
     for(int i = range.begin(); i != range.end(); ++i){
         // TODO parallelization via mutex
+      if (ComplicatedFunction(a_ptr[i]) == 0) {
+        spin_mutex::scoped_lock lock(mutex);
+        counterParM++;
+      }
     }
   }
 
@@ -63,7 +75,7 @@ int main ()
   }
   
   TStopwatch timer;
-  for(int i = 0; i != N; ++i){
+  for(int i = 0; i != N; ++i) {
     if (ComplicatedFunction(a[i]) == 0) counter++;
   }
   timer.Stop();
@@ -74,14 +86,14 @@ int main ()
   
   // TODO: Implement here your parallelization via atomic counter
   timer.Start();
-
+  parallel_for(blocked_range<long unsigned int>(0,N), ApplyTBBA(a));
   timer.Stop();
   
   float timeParA = timer.RealTime()*1000;
   
   // TODO: Implement here your parallelization via mutex
   timer.Start();
-
+  parallel_for(blocked_range<long unsigned int>(0,N), ApplyTBBM(a));
   timer.Stop();
   
   float timeParM = timer.RealTime()*1000;

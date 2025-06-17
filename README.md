@@ -8,3 +8,4 @@
 - [Blatt 5 – Abgabe](https://docs.google.com/document/d/1WoHkqbnnXhRWZ_jLWCuGr0EcR6gaF_w3-CXE4PTKxLk/edit?usp=sharing)
 - [Blatt 6 – Abgabe](https://docs.google.com/document/d/1awQJ4cVZyfnGR647LtrhSlIKKzPXIIJ2T-3trNUj7kY/edit?tab=t.0)
 - [Blatt 7 – Abgabe](https://docs.google.com/document/d/1SwF7IykMJd-sZXiD1YHr74PcgPBmyyeX7ydQiedJYCs/edit?tab=t.0)
+- [Blatt 8 – Abgabe](https://docs.google.com/document/d/1256S9utPicJFPkmwYW5umdH4WsftBOSUzg45x1SPTSM/edit?tab=t.0)

@@ -5,6 +5,9 @@
 * g++ MatMul.cpp -o MatMul -O3 -fno-tree-vectorize -I/usr/include/gegl-0.4 -L/usr/lib64 /usr/lib64/libOpenCL.so.1
 */
 
+// g++ MatMul.cpp -o MatMulFast -O3 -fno-tree-vectorize -I/usr/include/gegl-0.4 -L/usr/lib64 /usr/lib64/libOpenCL.so.1 -msse -fopenmp -I~/Vc/include -L~/Vc/lib ~/Vc/lib/libVc.a
+//! noch rein
+
 #define CL_TARGET_OPENCL_VERSION 120
 
 #include <gegl-0.4/opencl/cl.h>
@@ -14,6 +17,9 @@
 #include <fstream>
 #include <sstream>
 #include <chrono>
+#include <omp.h>
+#include "Vc/Vc/Vc"
+#include <cstdlib>
 
 
 using Clock_t = std::chrono::steady_clock;
@@ -24,6 +30,16 @@ const std::string time_units = " ms";
 
 
 bool CompareMatrices(const std::vector<float>& mat1, const std::vector<float>& mat2, float tolerance, int N) {
+    for (int i = 0; i < N * N; ++i) {
+        if (std::abs(mat1[i] - mat2[i]) > tolerance) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// diese Definition hinzugefügt
+bool CompareMatrices(float* mat1, const std::vector<float>& mat2, float tolerance, int N) {
     for (int i = 0; i < N * N; ++i) {
         if (std::abs(mat1[i] - mat2[i]) > tolerance) {
             return false;
@@ -45,6 +61,24 @@ void ScalarMatrixMultiplication(const std::vector<float>& A, const std::vector<f
     }
 }
 
+void FastMatrixMultiplication(float* a, float* b_T, float* c, int N) {
+    // b_T ist eine Matrix b, die schon transponiert ist. Die Transponierung ist hilfreich für reinterpret_cast.
+    #pragma omp parallel for
+    for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+            Vc::float_v sum = 0.0f; // Dieser Vektor wird die partiellen Summen beinhalten
+            for (int k = 0; k < N; k += Vc::float_v::Size) {
+                Vc::float_v& aVec = reinterpret_cast<Vc::float_v&>(a[i * N + k]);
+                Vc::float_v& bVec = reinterpret_cast<Vc::float_v&>(b_T[j * N + k]);
+                sum += aVec * bVec; // Es wird "Zeile mal Zeile" gerechnet, da b transponiert ist.
+            }
+            for (int m = 0; m < Vc::float_v::Size; m++) {
+                c[i * N + j] += sum[m]; // die partiellen Summen werden zusammenaddiert
+            }
+        }
+    }
+} 
+
 
 std::string readKernelSource(const char* filename) {
     std::ifstream file(filename);
@@ -65,7 +99,8 @@ void checkError(cl_int err, const char* operation) {
 int main() {
     cl_int err;
 
-    const int N = 2048;
+    const int N = 16384;
+    std::cout << "N = " << N << ":\n" << std::endl;
     float tolerance = 1e-6;
 
     std::vector<float> A(N * N, 1.0f), B(N * N, 2.0f), C(N * N, 0.0f), C_scalar(N * N, 0.0f);
@@ -144,17 +179,56 @@ int main() {
     clReleaseCommandQueue(queue);
     clReleaseContext(context);
 
+    if (N <= 4096) {
+        start = Clock_t::now();
+        ScalarMatrixMultiplication(A, B, C_scalar, N);
+        finish = Clock_t::now();
+        elapsed = finish - start;
+        std::cout << "Scalar - elapsed time: " << std::chrono::duration_cast<TimeUnit_t>(elapsed).count() << time_units << std::endl;
+    }
+    else {
+        std::cout << "N too large for scalar version." << std::endl;
+    }
+
+    // Datenstrukturen mit besserer Speicherallokierung und -ausrichtung
+    float* A_omp = static_cast<float*>(std::aligned_alloc(16, N * N * sizeof(float)));
+    float* B_omp = static_cast<float*>(std::aligned_alloc(16, N * N * sizeof(float)));
+    float* C_omp = static_cast<float*>(std::aligned_alloc(16, N * N * sizeof(float)));
+
+    for (size_t i = 0; i < N * N; i++) {
+        A_omp[i] = 1.0f;
+        B_omp[i] = 2.0f; // Bemerkung: B_omp transponiert = B_omp
+        C_omp[i] = 0.0f;
+    }
+
     start = Clock_t::now();
-    ScalarMatrixMultiplication(A, B, C_scalar, N);
+    FastMatrixMultiplication(A_omp, B_omp, C_omp, N);
     finish = Clock_t::now();
     elapsed = finish - start;
-    std::cout << "Scalar - elapsed time: " << std::chrono::duration_cast<TimeUnit_t>(elapsed).count() << time_units << std::endl;
+    std::cout << "OpenMP + SIMD - elapsed time: " << std::chrono::duration_cast<TimeUnit_t>(elapsed).count() << time_units << std::endl;
 
-    bool isSame = CompareMatrices(C, C_scalar, tolerance, N);
-    if (isSame) {
-        std::cout << "The matrices are the same within tolerance." << std::endl;
-    } else {
-        std::cout << "The matrices are different." << std::endl;
+    if (N <= 4096) {
+        bool isSame = CompareMatrices(C, C_scalar, tolerance, N);
+        if (isSame) {
+            std::cout << "OpenCL and scalar matrices are the same within tolerance." << std::endl;
+        } else {
+            std::cout << "OpenCL and scalar matrices are different." << std::endl;
+        }
+    
+        isSame = CompareMatrices(C_omp, C_scalar, tolerance, N);
+        if (isSame) {
+            std::cout << "OpenMP and scalar matrices are the same within tolerance." << std::endl;
+        } else {
+            std::cout << "OpenMP and scalar matrices different." << std::endl;
+        }
+    }
+    else {
+        bool isSame = CompareMatrices(C_omp, C, tolerance, N);
+        if (isSame) {
+            std::cout << "OpenMP and OpenCL matrices are the same within tolerance." << std::endl;
+        } else {
+            std::cout << "OpenMP and OpenCL matrices are different." << std::endl;
+        }
     }
 
     return 0;

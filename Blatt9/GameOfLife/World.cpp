@@ -169,6 +169,10 @@ void World::evolve_parallel() {
             else if (this->grid[y][x] == 0 && aliveNeighbours == 3) {
                 newGrid[y][x] = 1;
             }
+            // Korrigierung neu hinzugefügt
+            else {
+                newGrid[y][x] = this->grid[y][x];
+            }
         }
     }
 
@@ -205,6 +209,10 @@ void World::evolve() {
             // Regel 4: Tote Zelle mit genau 3 lebenden Nachbarn wird lebendig
             else if (this->grid[y][x] == 0 && aliveNeighbours == 3) {
                 newGrid[y][x] = 1;
+            }
+            // Korrigierung neu hinzugefügt
+            else {
+                newGrid[y][x] = this->grid[y][x];
             }
         }
     }

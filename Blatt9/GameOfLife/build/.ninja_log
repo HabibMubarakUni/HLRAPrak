@@ -1,0 +1,9 @@
+# ninja log v6
+3	27	1749071701961243115	CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp.o	201d1aaeaf17b2dc
+6	699	1749071701964243087	CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp.o	816078cc85b1e21b
+4	908	1749071701963243096	CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp.o	115079edf478504c
+908	1062	1749071702866234642	GameOfLife	91b2ac9b9b714604
+5	545	1749071755151745155	CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp.o	6c438c8b640cc425
+7	830	1749071755153745136	CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp.o	1905a82fec807249
+5	1257	1749071755152745146	CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp.o	b477add096114fb9
+1257	1338	1749071756403733434	GameOfLife	a82ec107af4fb9a3

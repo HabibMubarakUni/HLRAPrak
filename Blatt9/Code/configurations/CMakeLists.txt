@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.27)
-project(GameOfLife)
+project(GameOfLife LANGUAGES CXX CUDA) # Für Blatt 9 hier geändert
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CUDA_STANDARD 17) # Für Blatt 9 hinzugefügt
+set(CMAKE_CUDA_STANDARD_REQUIRED ON) # Für Blatt 9 hinzugefügt
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 include_directories("../includes")
@@ -10,6 +12,7 @@ add_executable(GameOfLife
   ../GameOfLife.cpp
   ../World.cpp
   ../cli.cpp
+  ../World.cu # Für Blatt 9 hinzugefügt
 )
 
 # Diese Zeile fügt den save/ Ordner in den build-Ordner ein

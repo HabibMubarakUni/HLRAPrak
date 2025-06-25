@@ -6,7 +6,7 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build/CMakeFiles/3.30.8/CMakeSystem.cmake"
+			"path" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt9/GameOfLife/build/CMakeFiles/3.30.8/CMakeSystem.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -20,11 +20,11 @@
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build/CMakeFiles/3.30.8/CMakeCCompiler.cmake"
+			"path" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt9/GameOfLife/build/CMakeFiles/3.30.8/CMakeCCompiler.cmake"
 		},
 		{
 			"isGenerated" : true,
-			"path" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build/CMakeFiles/3.30.8/CMakeCXXCompiler.cmake"
+			"path" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt9/GameOfLife/build/CMakeFiles/3.30.8/CMakeCXXCompiler.cmake"
 		},
 		{
 			"isCMake" : true,
@@ -130,7 +130,7 @@
 	"kind" : "cmakeFiles",
 	"paths" : 
 	{
-		"build" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build",
+		"build" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt9/GameOfLife/build",
 		"source" : "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations"
 	},
 	"version" : 

@@ -181,6 +181,32 @@ void World::evolve_parallel() {
     this->generation++;    
 }
 
+// Neu hinzugefügt für Blatt 9
+void World::EvolveCUDA() {
+    // Erstelle einen Stream
+    cudaStream_t stream;
+    cudaStreamCreate(&stream);
+    
+
+    // 2D-vector in 1D-array umwandeln
+    int *src;
+    for (int y = 0; y < this->height, y++) {
+        for (int x = 0; x < this->width, x++) {
+            src[y * this->width + x] = this->grid[y][x];
+        }
+    }
+
+    int *dest;
+
+    cudaMallocHost(&src, sizeof(int) * this->height * this->width);
+    cudaMallocHost(&dest, sizeof(int) * this->height * this->width);
+    int *d_src, *d_dest;
+    cudaMalloc(&d_src, sizeof(int) * this->height * this->width);
+    cudaMalloc(&d_dest, sizeof(int) * this->height * this->width);
+
+    cudaMemcpy(d_src, src, sizeof(int) * this->height * this->width, cudaMemcpyHostToDevice);
+}
+
 void World::evolve() {
     // Neues Grid für die nächste Generation
     std::vector<std::vector<int>> newGrid;

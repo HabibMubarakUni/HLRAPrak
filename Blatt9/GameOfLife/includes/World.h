@@ -22,8 +22,11 @@ public:
     // Zählt die Anzahl lebender Nachbarn der Zelle an Position (x, y)
     int count_alive_neighbours(int x, int y);
 
-    // Neu hinzugefügt für Blatt 6
+    // Hinzugefügt für Blatt 6
     void evolve_parallel();
+
+    // Neu hinzugefügt für Blatt 9
+    void EvolveCUDA();
 
     // Entwickelt die Welt um eine Generation weiter nach den Regeln von Conway's Game of Life
     void evolve();

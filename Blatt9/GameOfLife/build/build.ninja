@@ -12,7 +12,7 @@
 
 # =============================================================================
 # Project: GameOfLife
-# Configurations: Release
+# Configurations: Debug
 # =============================================================================
 
 #############################################
@@ -24,7 +24,7 @@ ninja_required_version = 1.5
 #############################################
 # Set configuration variable for custom commands.
 
-CONFIGURATION = Release
+CONFIGURATION = Debug
 # =============================================================================
 # Include auxiliary files.
 
@@ -39,7 +39,7 @@ include CMakeFiles/rules.ninja
 #############################################
 # Logical path to working directory; prefix for absolute paths.
 
-cmake_ninja_workdir = /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build/
+cmake_ninja_workdir = /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt9/GameOfLife/build/
 # =============================================================================
 # Object build statements for EXECUTABLE target GameOfLife
 
@@ -49,23 +49,23 @@ cmake_ninja_workdir = /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Bla
 
 build cmake_object_order_depends_target_GameOfLife: phony || .
 
-build CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp.o: CXX_COMPILER__GameOfLife_unscanned_Release /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp || cmake_object_order_depends_target_GameOfLife
+build CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp.o: CXX_COMPILER__GameOfLife_unscanned_Debug /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp || cmake_object_order_depends_target_GameOfLife
   DEP_FILE = CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -O3 -fopenmp
+  FLAGS = -g
   INCLUDES = -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations/../includes
   OBJECT_DIR = CMakeFiles/GameOfLife.dir
   OBJECT_FILE_DIR = CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife
 
-build CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp.o: CXX_COMPILER__GameOfLife_unscanned_Release /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp || cmake_object_order_depends_target_GameOfLife
+build CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp.o: CXX_COMPILER__GameOfLife_unscanned_Debug /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp || cmake_object_order_depends_target_GameOfLife
   DEP_FILE = CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -O3 -fopenmp
+  FLAGS = -g
   INCLUDES = -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations/../includes
   OBJECT_DIR = CMakeFiles/GameOfLife.dir
   OBJECT_FILE_DIR = CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife
 
-build CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp.o: CXX_COMPILER__GameOfLife_unscanned_Release /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp || cmake_object_order_depends_target_GameOfLife
+build CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp.o: CXX_COMPILER__GameOfLife_unscanned_Debug /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp || cmake_object_order_depends_target_GameOfLife
   DEP_FILE = CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp.o.d
-  FLAGS = -O3 -DNDEBUG -O3 -fopenmp
+  FLAGS = -g
   INCLUDES = -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations/../includes
   OBJECT_DIR = CMakeFiles/GameOfLife.dir
   OBJECT_FILE_DIR = CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife
@@ -78,8 +78,8 @@ build CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLR
 #############################################
 # Link the executable GameOfLife
 
-build GameOfLife: CXX_EXECUTABLE_LINKER__GameOfLife_Release CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp.o CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp.o CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp.o
-  FLAGS = -O3 -DNDEBUG -O3 -fopenmp
+build GameOfLife: CXX_EXECUTABLE_LINKER__GameOfLife_Debug CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/GameOfLife.cpp.o CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/World.cpp.o CMakeFiles/GameOfLife.dir/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/cli.cpp.o
+  FLAGS = -g
   OBJECT_DIR = CMakeFiles/GameOfLife.dir
   POST_BUILD = :
   PRE_LINK = :
@@ -91,7 +91,7 @@ build GameOfLife: CXX_EXECUTABLE_LINKER__GameOfLife_Release CMakeFiles/GameOfLif
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build && /usr/bin/ccmake -S/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations -B/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build
+  COMMAND = cd /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt9/GameOfLife/build && /usr/bin/ccmake -S/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations -B/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt9/GameOfLife/build
   DESC = Running CMake cache editor...
   pool = console
   restat = 1
@@ -103,7 +103,7 @@ build edit_cache: phony CMakeFiles/edit_cache.util
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cd /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build && /usr/bin/cmake --regenerate-during-build -S/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations -B/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build
+  COMMAND = cd /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt9/GameOfLife/build && /usr/bin/cmake --regenerate-during-build -S/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/configurations -B/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt9/GameOfLife/build
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -119,7 +119,7 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 
 #############################################
-# Folder: /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt6/Code/GameOfLife/build
+# Folder: /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt9/GameOfLife/build
 
 build all: phony GameOfLife
 

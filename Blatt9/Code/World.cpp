@@ -6,8 +6,7 @@
 #include <chrono>
 #include <thread>
 #include <filesystem>
-#include <omp.h> // Hinzugefügt für Blatt 6
-#include "includes/World.cuh" // Neu hinzugefügt für Blatt 9
+#include "includes/World.cuh" // Für Blatt 9 hinzugefügt
 
 
 // Konstruktor mit Höhe und Breite
@@ -17,14 +16,11 @@ World::World(int height, int width) {
     this->width = width;
     this->generation = 0;
 
-    // Initialisiert die Grids mit Nullen (height x width)
+    // Initialisiert das Grid mit Nullen (height x width)
     this->grid.resize(height);  // Anzahl der Zeilen
-    this->grid_for_evolve.resize(height);
 
     for (int i = 0; i < height; ++i) {
-        // Jede Zeile mit Nullen füllen
-        this->grid[i] = std::vector<int>(width, 0);
-        this->grid_for_evolve[i] = std::vector<int>(width, 0);
+        this->grid[i] = std::vector<int>(width, 0);  // Jede Zeile mit Nullen füllen
     }
 }
 
@@ -44,10 +40,8 @@ World::World(std::string file_name) {
 
     // Initialisiert das Grid mit den gelesenen Maßen und füllt es mit Nullen
     this->grid.resize(height);  // Jetzt existieren grid[0] bis grid[height-1]
-    this->grid_for_evolve.resize(height);
     for (int i = 0; i < height; ++i) {
         this->grid[i] = std::vector<int>(width, 0);  // Jede Zeile mit Nullen füllen
-        this->grid_for_evolve[i] = std::vector<int>(width, 0);
     }
     
     // Liest die Werte für das Grid aus der Datei
@@ -139,111 +133,18 @@ int World::count_alive_neighbours(int x, int y) {
   
     return aliveNeighbours;
   }
-
-// Hinzugefügt für Blatt 9
-inline cudaError_t checkCuda(cudaError_t result) {
-    if (result != cudaSuccess) {
-        fprintf(stderr, "CUDA Runtime Error: %s\n", cudaGetErrorString(result));
-    }
-    return result;
-}
-
-// Neu hinzugefügt für Blatt 6
-void World::evolve_parallel() {
-    constexpr int NUM_THREADS = 4;
-    // Gehe jede Zelle durch und wende die Spielregeln an
-    #pragma omp parallel for num_threads(NUM_THREADS)
-    for (int y = 0; y < this->height; y++) {
-        for (int x = 0; x < this->width; x++) {
-            int aliveNeighbours = count_alive_neighbours(x, y);
-
-            // Regel 1: Lebende Zelle mit weniger als 2 lebenden Nachbarn stirbt
-            if (this->grid[y][x] == 1 && aliveNeighbours < 2) {
-                this->grid_for_evolve[y][x] = 0;
-            }
-            // Regel 2: Lebende Zelle mit 2 oder 3 lebenden Nachbarn bleibt am Leben
-            else if (this->grid[y][x] == 1 && (aliveNeighbours == 2 || aliveNeighbours == 3)) {
-                this->grid_for_evolve[y][x] = 1;
-            }
-            // Regel 3: Lebende Zelle mit mehr als 3 lebenden Nachbarn stirbt
-            else if (this->grid[y][x] == 1 && aliveNeighbours > 3) {
-                this->grid_for_evolve[y][x] = 0;
-            }
-            // Regel 4: Tote Zelle mit genau 3 lebenden Nachbarn wird lebendig
-            else if (this->grid[y][x] == 0 && aliveNeighbours == 3) {
-                this->grid_for_evolve[y][x] = 1;
-            }
-            // Korrigierung neu hinzugefügt
-            else {
-                this->grid_for_evolve[y][x] = this->grid[y][x];
-            }
-        }
-    }
-
-    // Übernehme das neue Grid und erhöhe die Generation
-    std::swap(this->grid, this->grid_for_evolve); // Zeile geändert für viel bessere Performance (keine Kopie, vertauscht Pointers)
-    this->generation++;    
-}
-
-// Neu hinzugefügt für Blatt 9
-void World::EvolveCUDA(int generations_amount) {
-    // Erstelle einen Stream
-    cudaStream_t stream;
-    cudaStreamCreate(&stream);
-
-    checkCuda(cudaGetLastError());
-    
-    int *h_grid;
-    // Allokiere Speicher auf Host
-    cudaMallocHost(&h_grid, sizeof(int) * this->height * this->width);
-
-    int *d_grid, *d_grid_for_evolve;
-    // Allokiere Speicher auf Device/VRAM (für 2 Gitter/Arrays, denn evolve arbeitet mit 2 Gitter)
-    cudaMalloc(&d_grid, sizeof(int) * this->height * this->width);
-    cudaMalloc(&d_grid_for_evolve, sizeof(int) * this->height * this->width);
-    
-    // 2D-vector in 1D-array umwandeln
-    for (int y = 0; y < this->height; y++) {
-        for (int x = 0; x < this->width; x++) {
-            h_grid[y * this->width + x] = this->grid[y][x];
-        }
-    }
-
-    // Kopiere Daten von Host nach VRAM
-    cudaMemcpy(d_grid, h_grid, sizeof(int) * this->height * this->width, cudaMemcpyHostToDevice);
-
-    checkCuda(cudaGetLastError());
-
-    // 64 * 256 = 16384 > 10000 = Anzahl der Zellen im p67_snark_loop Gitter => Jede Zelle kriegt einen Thread, es gibt genug
-    constexpr int n_blocks = 64;
-    constexpr int n_threads = 256;
-
-    for (int gen = 0; gen < generations_amount; gen++) {
-        UpdateCellsCUDA<<n_blocks, n_threads, 0, stream>>(d_grid, d_grid_for_evolve, this->height, this->width);
-        checkCuda(cudaGetLastError());
-        cudaDeviceSynchronize();
-        checkCuda(cudaGetLastError());
-        std::swap(d_grid, d_grid_for_evolve); // vertausche Pointers
-    }
-
-    // nicht d_grid_for_evolve, denn es wurde zuletzt std::swap oben angewendet
-    cudaMemcpy(h_grid, d_grid, sizeof(int) * this->height * this->width, cudaMemcpyDeviceToHost);
-
-    // 1D-array in 2D-vector umwandeln
-    for (int i = 0; i < this->height * this->width; i++) {
-        this->grid[i / width][i % width] = h_grid[i];
-    }
-    this->generation += generations_amount;
-
-    cudaFree(d_grid);
-    cudaFree(d_grid_for_evolve);
-    cudaFreeHost(h_grid);
-    cudaStreamDestroy(stream);
-    
-    checkCuda(cudaGetLastError());
-}
+  
+  
+  
 
 void World::evolve() {
+    // Neues Grid für die nächste Generation
+    std::vector<std::vector<int>> newGrid;
+    newGrid.resize(this->height); // height Zeilen
+    for (int i = 0; i < this->height; ++i) {
+        newGrid[i] = std::vector<int>(this->width, 0);  // Jede Zeile mit Nullen füllen
+    }
+
     // Gehe jede Zelle durch und wende die Spielregeln an
     for (int y = 0; y < this->height; y++) {
         for (int x = 0; x < this->width; x++) {
@@ -251,29 +152,25 @@ void World::evolve() {
 
             // Regel 1: Lebende Zelle mit weniger als 2 lebenden Nachbarn stirbt
             if (this->grid[y][x] == 1 && aliveNeighbours < 2) {
-                this->grid_for_evolve[y][x] = 0;
+                newGrid[y][x] = 0;
             }
             // Regel 2: Lebende Zelle mit 2 oder 3 lebenden Nachbarn bleibt am Leben
             else if (this->grid[y][x] == 1 && (aliveNeighbours == 2 || aliveNeighbours == 3)) {
-                this->grid_for_evolve[y][x] = 1;
+                newGrid[y][x] = 1;
             }
             // Regel 3: Lebende Zelle mit mehr als 3 lebenden Nachbarn stirbt
             else if (this->grid[y][x] == 1 && aliveNeighbours > 3) {
-                this->grid_for_evolve[y][x] = 0;
+                newGrid[y][x] = 0;
             }
             // Regel 4: Tote Zelle mit genau 3 lebenden Nachbarn wird lebendig
             else if (this->grid[y][x] == 0 && aliveNeighbours == 3) {
-                this->grid_for_evolve[y][x] = 1;
-            }
-            // Korrigierung neu hinzugefügt
-            else {
-                this->grid_for_evolve[y][x] = this->grid[y][x];
+                newGrid[y][x] = 1;
             }
         }
     }
 
     // Übernehme das neue Grid und erhöhe die Generation
-    std::swap(this->grid, this->grid_for_evolve); // Zeile geändert für viel bessere Performance (keine Kopie, vertauscht Pointers)
+    this->grid = newGrid;
     this->generation++;
 }
 

@@ -11,6 +11,7 @@ private:
     int width;                                 // Breite der Welt (Anzahl Spalten)
     int generation;                            // Aktuelle Generation des Spiels
     std::vector<std::vector<int>> grid;        // 2D-Grid zur Speicherung der Weltzustände (0 = tot, 1 = lebendig)
+    std::vector<std::vector<int>> grid_for_evolve; // Neu hinzugefügt für bessere Performance
 
 public:
     // Konstruktor: Erstellt eine leere Welt mit gegebener Höhe und Breite
@@ -22,11 +23,14 @@ public:
     // Zählt die Anzahl lebender Nachbarn der Zelle an Position (x, y)
     int count_alive_neighbours(int x, int y);
 
+    // Hinzugefügt für Blatt 9
+    inline cudaError_t checkCuda(cudaError_t result);
+
     // Hinzugefügt für Blatt 6
     void evolve_parallel();
 
     // Neu hinzugefügt für Blatt 9
-    void EvolveCUDA();
+    void EvolveCUDA(int generations_amount);
 
     // Entwickelt die Welt um eine Generation weiter nach den Regeln von Conway's Game of Life
     void evolve();

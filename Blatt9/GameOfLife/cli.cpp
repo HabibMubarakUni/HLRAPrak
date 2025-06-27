@@ -195,9 +195,17 @@ void CommandLineInterface::menu() {
                     std::cin >> simMode;
 
                     int maxGenerations = -1;
+                    int parallelizationMethod = 1;
                     if (simMode == 2) {
                         clearScreen();
                         if (showOutput) world.print();
+                        std::cout << "Soll Parallelisierung verwendet werden?:\n";
+                        std::cout << "1. Skalar (keine Parallelisierung)\n";
+                        std::cout << "2. OpenMP\n";
+                        std::cout << "3. CUDA\n";
+                        std::cout << ">> ";
+                        std::cin >> parallelizationMethod;
+                        clearScreen();
                         std::cout << "Wie viele Generationen sollen simuliert werden? ";
                         std::cin >> maxGenerations;
                     }
@@ -244,14 +252,18 @@ void CommandLineInterface::menu() {
                             stop = true;
                             break;
                         }
-                        // world.evolve();
-                        // world.evolve_parallel(); // Neu hinzugefügt für Blatt 6
-                        // generations++;
-
-                        //! (Start) dieser Teil ist temp. Später in eine Condition reinpacken 
-                        world.EvolveCUDA(maxGenerations);
-                        generations += maxGenerations;
-                        //! (Ende) dieser Teil ist temp. Später in eine Condition reinpacken 
+                        if (parallelizationMethod == 2) {
+                            world.evolve_parallel();
+                            generations++;
+                        }
+                        else if (parallelizationMethod == 3) {
+                            world.EvolveCUDA(maxGenerations); // Hinzugefügt für Blatt 9
+                            generations += maxGenerations;
+                        }
+                        else {
+                            world.evolve();
+                            generations++;
+                        }
 
                         if (showOutput) {
                             clearScreen();

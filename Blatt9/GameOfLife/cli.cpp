@@ -245,8 +245,13 @@ void CommandLineInterface::menu() {
                             break;
                         }
                         // world.evolve();
-                        world.evolve_parallel(); // Neu hinzugefügt für Blatt 6
-                        generations++;
+                        // world.evolve_parallel(); // Neu hinzugefügt für Blatt 6
+                        // generations++;
+
+                        //! (Start) dieser Teil ist temp. Später in eine Condition reinpacken 
+                        world.EvolveCUDA(maxGenerations);
+                        generations += maxGenerations;
+                        //! (Ende) dieser Teil ist temp. Später in eine Condition reinpacken 
 
                         if (showOutput) {
                             clearScreen();

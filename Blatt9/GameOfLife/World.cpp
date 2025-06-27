@@ -1,4 +1,6 @@
 #include "includes/World.h"     // Einbindung der Header-Datei mit der Klassendeklaration
+#include "includes/World.cuh" // Hinzugefügt für Blatt 9
+
 #include <fstream>              // Für Dateioperationen (z.B. Datei schreiben oder lesen)     
 #include <iostream>
 #include <cstdlib> // für rand()
@@ -7,7 +9,6 @@
 #include <thread>
 #include <filesystem>
 #include <omp.h> // Hinzugefügt für Blatt 6
-#include "includes/World.cuh" // Neu hinzugefügt für Blatt 9
 
 
 // Konstruktor mit Höhe und Breite
@@ -140,14 +141,6 @@ int World::count_alive_neighbours(int x, int y) {
     return aliveNeighbours;
   }
 
-// Hinzugefügt für Blatt 9
-inline cudaError_t checkCuda(cudaError_t result) {
-    if (result != cudaSuccess) {
-        fprintf(stderr, "CUDA Runtime Error: %s\n", cudaGetErrorString(result));
-    }
-    return result;
-}
-
 // Neu hinzugefügt für Blatt 6
 void World::evolve_parallel() {
     constexpr int NUM_THREADS = 4;
@@ -187,60 +180,8 @@ void World::evolve_parallel() {
 
 // Neu hinzugefügt für Blatt 9
 void World::EvolveCUDA(int generations_amount) {
-    // Erstelle einen Stream
-    cudaStream_t stream;
-    cudaStreamCreate(&stream);
-
-    checkCuda(cudaGetLastError());
-    
-    int *h_grid;
-    // Allokiere Speicher auf Host
-    cudaMallocHost(&h_grid, sizeof(int) * this->height * this->width);
-
-    int *d_grid, *d_grid_for_evolve;
-    // Allokiere Speicher auf Device/VRAM (für 2 Gitter/Arrays, denn evolve arbeitet mit 2 Gitter)
-    cudaMalloc(&d_grid, sizeof(int) * this->height * this->width);
-    cudaMalloc(&d_grid_for_evolve, sizeof(int) * this->height * this->width);
-    
-    // 2D-vector in 1D-array umwandeln
-    for (int y = 0; y < this->height; y++) {
-        for (int x = 0; x < this->width; x++) {
-            h_grid[y * this->width + x] = this->grid[y][x];
-        }
-    }
-
-    // Kopiere Daten von Host nach VRAM
-    cudaMemcpy(d_grid, h_grid, sizeof(int) * this->height * this->width, cudaMemcpyHostToDevice);
-
-    checkCuda(cudaGetLastError());
-
-    // 64 * 256 = 16384 > 10000 = Anzahl der Zellen im p67_snark_loop Gitter => Jede Zelle kriegt einen Thread, es gibt genug
-    constexpr int n_blocks = 64;
-    constexpr int n_threads = 256;
-
-    for (int gen = 0; gen < generations_amount; gen++) {
-        UpdateCellsCUDA<<n_blocks, n_threads, 0, stream>>(d_grid, d_grid_for_evolve, this->height, this->width);
-        checkCuda(cudaGetLastError());
-        cudaDeviceSynchronize();
-        checkCuda(cudaGetLastError());
-        std::swap(d_grid, d_grid_for_evolve); // vertausche Pointers
-    }
-
-    // nicht d_grid_for_evolve, denn es wurde zuletzt std::swap oben angewendet
-    cudaMemcpy(h_grid, d_grid, sizeof(int) * this->height * this->width, cudaMemcpyDeviceToHost);
-
-    // 1D-array in 2D-vector umwandeln
-    for (int i = 0; i < this->height * this->width; i++) {
-        this->grid[i / width][i % width] = h_grid[i];
-    }
+    EvolveWrapper(generations_amount, this->height, this->width, this->grid);
     this->generation += generations_amount;
-
-    cudaFree(d_grid);
-    cudaFree(d_grid_for_evolve);
-    cudaFreeHost(h_grid);
-    cudaStreamDestroy(stream);
-    
-    checkCuda(cudaGetLastError());
 }
 
 void World::evolve() {
@@ -265,7 +206,7 @@ void World::evolve() {
             else if (this->grid[y][x] == 0 && aliveNeighbours == 3) {
                 this->grid_for_evolve[y][x] = 1;
             }
-            // Korrigierung neu hinzugefügt
+            // Korrigierung neu hinzugefügt 
             else {
                 this->grid_for_evolve[y][x] = this->grid[y][x];
             }
@@ -326,8 +267,11 @@ bool World::load(std::string file_name) {
     // Dateiinhalt lesen
     file >> this->height >> this->width;
     this->grid.resize(height);
-    for (int i = 0; i < height; ++i)
+    this->grid_for_evolve.resize(height);
+    for (int i = 0; i < height; ++i) {
         this->grid[i] = std::vector<int>(width, 0);
+        this->grid_for_evolve[i] = std::vector<int>(width, 0);
+    }
 
     for (int i = 0; i < height; ++i)
         for (int j = 0; j < width; ++j)

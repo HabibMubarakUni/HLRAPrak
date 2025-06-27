@@ -1,5 +1,4 @@
-//! #pragma once
+#pragma once
+#include <vector>
 
-__device__ int CountAliveNeighbours(int* grid, int i, int height, int width);
-
-__global__ void UpdateCellsCUDA(int* grid, int* newGrid, int height, int width);
+void EvolveWrapper(int generations_amount, int height, int width, std::vector<std::vector<int>>& grid);

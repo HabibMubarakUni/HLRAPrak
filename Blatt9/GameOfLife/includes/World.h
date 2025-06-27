@@ -23,9 +23,6 @@ public:
     // Zählt die Anzahl lebender Nachbarn der Zelle an Position (x, y)
     int count_alive_neighbours(int x, int y);
 
-    // Hinzugefügt für Blatt 9
-    inline cudaError_t checkCuda(cudaError_t result);
-
     // Hinzugefügt für Blatt 6
     void evolve_parallel();
 

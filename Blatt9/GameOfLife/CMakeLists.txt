@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(GameOfLife LANGUAGES CXX CUDA) # Für Blatt 9 hier geändert
 
-enable_language(CUDA) #vllt raus
+enable_language(CUDA) 
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CUDA_STANDARD 17) # Für Blatt 9 hinzugefügt

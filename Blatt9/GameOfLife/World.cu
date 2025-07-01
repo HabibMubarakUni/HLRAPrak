@@ -71,7 +71,7 @@ void EvolveWrapper(int generations_amount, int height, int width, std::vector<st
     checkCuda(cudaGetLastError());
     
     int *h_grid;
-    // Allokiere Speicher auf Host
+    // Allokiere Speicher auf Host (RAM bzw. CPU)
     cudaMallocHost(&h_grid, sizeof(int) * height * width);
 
     int *d_grid, *d_grid_for_evolve;

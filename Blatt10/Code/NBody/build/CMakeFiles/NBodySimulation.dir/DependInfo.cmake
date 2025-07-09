@@ -1,0 +1,24 @@
+
+# Consider dependencies only in project.
+set(CMAKE_DEPENDS_IN_PROJECT_ONLY OFF)
+
+# The set of languages for which implicit dependencies are needed:
+set(CMAKE_DEPENDS_LANGUAGES
+  )
+
+# The set of dependency files which are needed:
+set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt10/Code/NBody/NBody.cpp" "CMakeFiles/NBodySimulation.dir/NBody.cpp.o" "gcc" "CMakeFiles/NBodySimulation.dir/NBody.cpp.o.d"
+  "/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt10/Code/NBody/src/Body.cpp" "CMakeFiles/NBodySimulation.dir/src/Body.cpp.o" "gcc" "CMakeFiles/NBodySimulation.dir/src/Body.cpp.o.d"
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_LINKED_INFO_FILES
+  )
+
+# Targets to which this target links which contain Fortran sources.
+set(CMAKE_Fortran_TARGET_FORWARD_LINKED_INFO_FILES
+  )
+
+# Fortran module output directory.
+set(CMAKE_Fortran_TARGET_MODULE_DIR "")

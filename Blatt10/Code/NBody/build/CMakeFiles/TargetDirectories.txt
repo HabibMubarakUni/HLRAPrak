@@ -1,0 +1,3 @@
+/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt10/Code/NBody/build/CMakeFiles/NBodySimulation.dir
+/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt10/Code/NBody/build/CMakeFiles/edit_cache.dir
+/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt10/Code/NBody/build/CMakeFiles/rebuild_cache.dir

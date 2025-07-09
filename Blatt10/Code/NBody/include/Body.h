@@ -1,8 +1,9 @@
 #pragma once
-#include <vector>
+#include <cstddef>
+#include <cstdlib>
+#include <immintrin.h> // für _mm_malloc/_mm_free
 
-class Body {
-public:
+struct Body {
     // Position
     float posX;
     float posY;
@@ -19,12 +20,5 @@ public:
     float mass;
 
     // Konstruktor
-    Body(float x, float y, float vx, float vy, float m);
-
+    Body(float px, float py, float vx, float vy, float m);
 };
-
-// compute_forces deklarieren
-void compute_forces(std::vector<Body>& bodies, float G, float eps);
-
-// updates of Body Positions
-void integrate_bodies(std::vector<Body>& bodies, float dt);

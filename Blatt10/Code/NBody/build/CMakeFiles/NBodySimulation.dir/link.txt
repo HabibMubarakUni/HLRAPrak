@@ -1,0 +1,1 @@
+/usr/bin/g++ CMakeFiles/NBodySimulation.dir/NBody.cpp.o CMakeFiles/NBodySimulation.dir/src/Body.cpp.o -o NBodySimulation  -Wl,-rpath,/home/users3/lio/s3091627/SFML/lib64 /home/users3/lio/s3091627/SFML/lib64/libsfml-graphics.so.2.6.1 /home/users3/lio/s3091627/SFML/lib64/libsfml-window.so.2.6.1 /home/users3/lio/s3091627/SFML/lib64/libsfml-system.so.2.6.1

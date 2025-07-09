@@ -2,9 +2,9 @@
 #include <cmath>
 
 void compute_forces(std::vector<Body>& bodies, float G, float eps) {
-    for (auto& bi : bodies) {
-        bi.accX = 0.f;
-        bi.accY = 0.f;
+    for (size_t i = 0; i < bodies.size(); ++i) {
+        bodies[i].accX = 0.f;
+        bodies[i].accY = 0.f;
     }
 
     for (size_t i = 0; i < bodies.size(); ++i) {
@@ -35,13 +35,13 @@ void compute_forces(std::vector<Body>& bodies, float G, float eps) {
 }
 
 void integrate_bodies(std::vector<Body>& bodies, float dt) {
-    for (auto& b : bodies) {
+    for (size_t i = 0; i < bodies.size(); ++i) {
         // Geschwindigkeit aktualisieren
-        b.velX += b.accX * dt;
-        b.velY += b.accY * dt;
+        bodies[i].velX += bodies[i].accX * dt;
+        bodies[i].velY += bodies[i].accY * dt;
 
         // Position aktualisieren
-        b.posX += b.velX * dt;
-        b.posY += b.velY * dt;
+        bodies[i].posX += bodies[i].velX * dt;
+        bodies[i].posY += bodies[i].velY * dt;
     }
 }

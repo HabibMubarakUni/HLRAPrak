@@ -21,10 +21,6 @@ public:
     // Konstruktor
     Body(float x, float y, float vx, float vy, float m);
 
-    // Methoden
-    void applyForce(float forceX, float forceY);
-    void update(float deltaTime);
-
 };
 
 // compute_forces deklarieren

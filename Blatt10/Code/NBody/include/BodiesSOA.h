@@ -11,12 +11,12 @@ struct BodiesSOA {
     std::vector<float> mass;
 
     BodiesSOA(size_t n) {
-        posX.reserve(n);
-        posY.reserve(n);
-        velX.reserve(n);
-        velY.reserve(n);
-        accX.reserve(n);
-        accY.reserve(n);
-        mass.reserve(n);
+        posX.resize(n);
+        posY.resize(n);
+        velX.resize(n);
+        velY.resize(n);
+        accX.resize(n);
+        accY.resize(n);
+        mass.resize(n);
     }
 };

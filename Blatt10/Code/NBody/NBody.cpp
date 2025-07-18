@@ -1,5 +1,9 @@
 #include <cmath>
 #include "include/Body.h"
+#include "include/BodiesSOA.h"
+#include <fstream>
+#include <sstream>
+
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <random> // um Bodies zu initialisieren
@@ -24,7 +28,7 @@
 constexpr float G = 1.f;
 constexpr float dt = .1f;
 constexpr float eps = 1e-1f;
-constexpr size_t n_bodies = 1000; /// hier ändern
+constexpr size_t n_bodies = 100; /// hier ändern
 constexpr float center_mass = 1000.f;
 
 
@@ -122,113 +126,277 @@ void initialize_bodies(std::vector<Body>& bodies, const size_t n_bodies, const f
     }
 }
 
-void init_opencl(){
-    cl_int err;
+void initialize_bodies_soa(BodiesSOA& bodies, const size_t n_bodies, float center_mass, int width, int height) {
+    std::mt19937 rng(42);
+    std::uniform_real_distribution<float> angle_dist(0.0f, 2.0f * M_PI);
+    std::uniform_real_distribution<float> radius_dist(50.0f, std::min(width, height) / 2.f - 20.f);
+    std::uniform_real_distribution<float> mass_dist(0.5f, 10.f);
 
-    // const int N = 2048;
-    // float tolerance = 1e-6;
+    // Körper 0 im Zentrum
+    bodies.posX[0] = 0.f;
+    bodies.posY[0] = 0.f;
+    bodies.velX[0] = 0.f;
+    bodies.velY[0] = 0.f;
+    bodies.accX[0] = 0.f;
+    bodies.accY[0] = 0.f;
+    bodies.mass[0] = center_mass;
 
-    // std::vector<float> A(N * N, 1.0f), B(N * N, 2.0f), C(N * N, 0.0f), C_scalar(N * N, 0.0f);
+    for (size_t i = 1; i < n_bodies; ++i) {
+        float angle = angle_dist(rng);
+        float r = radius_dist(rng);
+        float mass = mass_dist(rng);
 
-    // auto start = Clock_t::now();
+        float x = r * std::cos(angle);
+        float y = r * std::sin(angle);
 
-    // get a platform / device - the information about thewhole / select the device forcomputations
-    cl_uint platformCount;
-    cl_platform_id platform;
-    err = clGetPlatformIDs(1, &platform, &platformCount);
-    checkError(err, "clGetPlatformIDs");
+        float v = orbital_velocity_scalar(center_mass, r);
+        float vx = -v * std::sin(angle);
+        float vy = v * std::cos(angle);
 
-    cl_uint deviceCount;
-    cl_device_id device;
-    err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 1, &device, &deviceCount);
-    checkError(err, "clGetDeviceIDs");
-
-    // set a contextwithinwhich the programwillwork
-    cl_context context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
-    checkError(err, "clCreateContext");
-
-    // create a command-queue
-    cl_command_queue queue = clCreateCommandQueue(context, device, 0, &err);
-    checkError(err, "clCreateCommandQueue");
-
-    // create memorybuffer(s)
-    cl_mem bufferA = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * A.size(), A.data(), &err);
-    checkError(err, "clCreateBuffer (bufferA)");
-    cl_mem bufferB = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * B.size(), B.data(), &err);
-    checkError(err, "clCreateBuffer (bufferB)");
-    cl_mem bufferC = clCreateBuffer(context, CL_MEM_WRITE_ONLY, sizeof(float) * C.size(), NULL, &err);
-    checkError(err, "clCreateBuffer (bufferC)");
+        bodies.posX[i] = x;
+        bodies.posY[i] = y;
+        bodies.velX[i] = vx;
+        bodies.velY[i] = vy;
+        bodies.accX[i] = 0.f;
+        bodies.accY[i] = 0.f;
+        bodies.mass[i] = mass;
+    }
+}
 
 
-    std::string sourceStr = readKernelSource("matrix_addition.cl");
-    const char* source = sourceStr.c_str();
-    cl_program program = clCreateProgramWithSource(context, 1, &source, NULL, &err);
-    checkError(err, "clCreateProgramWithSource");
-
-    err = clBuildProgram(program, 1, &device, NULL, NULL, NULL);
+void checkError(cl_int err, const char* operation) {
     if (err != CL_SUCCESS) {
-        size_t log_size;
-        clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
-        std::vector<char> log(log_size);
-        clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, log_size, log.data(), NULL);
-        std::cerr << "Error during operation 'clBuildProgram': " << err << std::endl;
-        std::cerr << "Build log:" << std::endl << log.data() << std::endl;
+        std::cerr << "Error during operation '" << operation << "': " << err << std::endl;
         exit(1);
     }
+}
 
-    // create a kernel
-    cl_kernel kernel = clCreateKernel(program, "matrix_add", &err);
-    checkError(err, "clCreateKernel");
+std::string readKernelSource(const char* filename) {
+    std::ifstream file(filename);
+    std::stringstream buffer;
+    buffer << file.rdbuf();
+    return buffer.str();
+}
 
-    err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &bufferA);
-    checkError(err, "clSetKernelArg (bufferA)");
-    err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &bufferB);
-    checkError(err, "clSetKernelArg (bufferB)");
-    err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &bufferC);
-    checkError(err, "clSetKernelArg (bufferC)");
-    err = clSetKernelArg(kernel, 3, sizeof(int), &N);
-    checkError(err, "clSetKernelArg (N)");
+void init_opencl(
+    size_t n,
+    size_t* global_work_size,
+    size_t* local_work_size,
+    BodiesSOA& bodies,
+    cl_context& context,
+    cl_command_queue& queue,
+    cl_program& program,
+    cl_kernel& compute_forces_kernel,
+    cl_kernel& integrate_bodies_kernel,
+    cl_mem& posX_buf,
+    cl_mem& posY_buf,
+    cl_mem& accX_buf,
+    cl_mem& accY_buf,
+    cl_mem& velX_buf,
+    cl_mem& velY_buf,
+    cl_mem& mass_buf){
 
-    size_t global_work_size[1] = { (size_t)N};
-    size_t local_work_size[1] = { 16 };
+        cl_int err;
+        cl_uint platformCount;
+        cl_platform_id platform;
+        err = clGetPlatformIDs(1, &platform, &platformCount);
+        checkError(err, "clGetPlatformIDs");
+
+        cl_uint deviceCount;
+        cl_device_id device;
+        err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 1, &device, &deviceCount);
+        checkError(err, "clGetDeviceIDs");
+
+        // set a context with in which the program will work
+        context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
+        checkError(err, "clCreateContext");
+
+        // create a command-queue
+        queue = clCreateCommandQueue(context, device, 0, &err);
+        checkError(err, "clCreateCommandQueue");
+
+        // create memorybuffer(s)
+        posX_buf = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * n, bodies.posX.data(), &err);
+        checkError(err, "clCreateBuffer (posX_buf)");
+        posY_buf = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * n, bodies.posY.data(), &err);
+        checkError(err, "clCreateBuffer (posY_buf)");
+        velX_buf = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * n, bodies.velX.data(), &err);
+        checkError(err, "clCreateBuffer (velX_buf)");
+        velY_buf = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * n, bodies.velY.data(), &err);
+        checkError(err, "clCreateBuffer (velY_buf)");
+        accX_buf = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * n, bodies.accX.data(), &err);
+        checkError(err, "clCreateBuffer (accX_buf)");
+        accY_buf = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * n, bodies.accY.data(), &err);
+        checkError(err, "clCreateBuffer (accY_buf)");
+        mass_buf = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * n, bodies.mass.data(), &err);
+        checkError(err, "clCreateBuffer (mass_buf)");
+        
+
+        
+        // load OpenCl-Kernel
+        std::string sourceStr = readKernelSource("NBody.cl");
+        const char* source = sourceStr.c_str();
+        program = clCreateProgramWithSource(context, 1, &source, NULL, &err);
+        checkError(err, "clCreateProgramWithSource");
+        
+        // translate for device
+        err = clBuildProgram(program, 1, &device, NULL, NULL, NULL);
+
+        if (err != CL_SUCCESS) {
+            size_t log_size;
+            clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, 0, NULL, &log_size);
+            std::vector<char> log(log_size);
+            clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, log_size, log.data(), NULL);
+            std::cerr << "Error during operation 'clBuildProgram': " << err << std::endl;
+            std::cerr << "Build log:" << std::endl << log.data() << std::endl;
+            exit(1);
+        }
+
+        global_work_size[0] =  n_bodies ;
+        local_work_size[0] =  16 ;
+
+        // create a kernel
+        compute_forces_kernel = clCreateKernel(program, "compute_forces", &err);
+        checkError(err, "clCreateComputeForcesKernel");
+        integrate_bodies_kernel = clCreateKernel(program, "integrate_bodies", &err);
+        checkError(err, "clCreateIntegrateBodiesKernel");
+}
+
+
+void run_opencl(
+    BodiesSOA& bodies,
+    cl_mem& posX_buf, 
+    cl_mem& posY_buf, 
+    cl_mem& accX_buf, 
+    cl_mem& accY_buf, 
+    cl_mem& velX_buf,
+    cl_mem& velY_buf,
+    cl_mem& mass_buf,
+    const float& dt,
+    const int& n,
+    const float& G,
+    const float& eps,
+    cl_command_queue& queue,
+    cl_kernel& compute_forces_kernel,
+    cl_kernel& integrate_bodies_kernel,
+    const size_t* global_work_size, 
+    const size_t* local_work_size,
+    cl_int& err){
+    // compute_forces Kernel-Argumente setzen
+    err = clSetKernelArg(compute_forces_kernel, 0, sizeof(cl_mem), &posX_buf);
+    checkError(err, "clSetKernelArg (posX_buf)");
+    err = clSetKernelArg(compute_forces_kernel, 1, sizeof(cl_mem), &posY_buf);
+    checkError(err, "clSetKernelArg (posY_buf)");
+    err = clSetKernelArg(compute_forces_kernel, 2, sizeof(cl_mem), &accX_buf);
+    checkError(err, "clSetKernelArg (accX_buf)");
+    err = clSetKernelArg(compute_forces_kernel, 3, sizeof(cl_mem), &accY_buf);
+    checkError(err, "clSetKernelArg (accY_buf)");
+    err = clSetKernelArg(compute_forces_kernel, 4, sizeof(cl_mem), &mass_buf);
+    checkError(err, "clSetKernelArg (mass_buf)");
+    err = clSetKernelArg(compute_forces_kernel, 5, sizeof(int), &n);
+    checkError(err, "clSetKernelArg (n)");
+    err = clSetKernelArg(compute_forces_kernel, 6, sizeof(float), &G);
+    checkError(err, "clSetKernelArg (G)");
+    err = clSetKernelArg(compute_forces_kernel, 7, sizeof(float), &eps);
+    checkError(err, "clSetKernelArg (eps)");
+
+    // integrate_bodies Kernel-Argumente setzen
+    err = clSetKernelArg(integrate_bodies_kernel, 0, sizeof(cl_mem), &posX_buf);
+    checkError(err, "clSetKernelArg (posX_buf)");
+    err = clSetKernelArg(integrate_bodies_kernel, 1, sizeof(cl_mem), &posY_buf);
+    checkError(err, "clSetKernelArg (posY_buf)");
+    err = clSetKernelArg(integrate_bodies_kernel, 2, sizeof(cl_mem), &velX_buf);
+    checkError(err, "clSetKernelArg (velX_buf)");
+    err = clSetKernelArg(integrate_bodies_kernel, 3, sizeof(cl_mem), &velY_buf);
+    checkError(err, "clSetKernelArg (velY_buf)");
+    err = clSetKernelArg(integrate_bodies_kernel, 4, sizeof(cl_mem), &accX_buf);
+    checkError(err, "clSetKernelArg (accX_buf)");
+    err = clSetKernelArg(integrate_bodies_kernel, 5, sizeof(cl_mem), &accY_buf);
+    checkError(err, "clSetKernelArg (accY_buf)");
+    err = clSetKernelArg(integrate_bodies_kernel, 6, sizeof(float), &dt);
+    checkError(err, "clSetKernelArg (dt_buf)");
 
     // call the kernel
-    err = clEnqueueNDRangeKernel(queue, kernel, 2, NULL, global_work_size, local_work_size, 0, NULL, NULL);
+    err = clEnqueueNDRangeKernel(queue, compute_forces_kernel, 1, NULL, global_work_size, local_work_size, 0, NULL, NULL);
     checkError(err, "clEnqueueNDRangeKernel");
 
+    // call the kernel
+    err = clEnqueueNDRangeKernel(queue, integrate_bodies_kernel, 1, NULL, global_work_size, local_work_size, 0, NULL, NULL);
+    checkError(err, "clEnqueueNDRangeKernel");
+
+    // wait for queue until it's finish
+    clFinish(queue);
+
+
     // read the buffer
-    err = clEnqueueReadBuffer(queue, bufferC, CL_TRUE, 0, sizeof(float) * C.size(), C.data(), 0, NULL, NULL);
-    checkError(err, "clEnqueueReadBuffer");
+    err = clEnqueueReadBuffer(queue, posX_buf, CL_TRUE, 0, sizeof(float) * n, bodies.posX.data(), 0, NULL, NULL);
+    checkError(err, "clEnqueueReadBuffer posX");
 
-    // auto finish = Clock_t::now();
-    // std::chrono::duration<double> elapsed = finish - start;
-    // std::cout << "OpenCL - elapsed time: " << std::chrono::duration_cast<TimeUnit_t>(elapsed).count() << time_units << std::endl;
-
-    // clean the memory
-    clReleaseMemObject(bufferA);
-    clReleaseMemObject(bufferB);
-    clReleaseMemObject(bufferC);
-    clReleaseKernel(kernel);
-    clReleaseProgram(program);
-    clReleaseCommandQueue(queue);
-    clReleaseContext(context);
-
-    // start = Clock_t::now();
-    // ScalarMatrixAddition(A, B, C_scalar, N);
-    // finish = Clock_t::now();
-    // elapsed = finish - start;
-    // std::cout << "Scalar - elapsed time: " << std::chrono::duration_cast<TimeUnit_t>(elapsed).count() << time_units << std::endl;
-
-    // bool isSame = CompareMatrices(C, C_scalar, tolerance, N);
-    // if (isSame) {
-    //     std::cout << "The matrices are the same within tolerance." << std::endl;
-    // } else {
-    //     std::cout << "The matrices are different." << std::endl;
-    // }
+    err = clEnqueueReadBuffer(queue, posY_buf, CL_TRUE, 0, sizeof(float) * n, bodies.posX.data(), 0, NULL, NULL);
+    checkError(err, "clEnqueueReadBuffer posY");
 
 }
 
+
+void cleanup_opencl(
+    cl_mem& posX_buf, 
+    cl_mem& posY_buf, 
+    cl_mem& accX_buf, 
+    cl_mem& accY_buf, 
+    cl_mem& velX_buf,
+    cl_mem& velY_buf,
+    cl_mem& mass_buf,
+    const cl_kernel& integrate_bodies_kernel,
+    const cl_kernel& compute_forces_kernel,
+    const cl_program& program,
+    const cl_command_queue& queue,
+    const cl_context& context){
+
+    // clean the memory
+    clReleaseMemObject(posX_buf);
+    clReleaseMemObject(posY_buf);
+    clReleaseMemObject(accX_buf);
+    clReleaseMemObject(accY_buf);
+    clReleaseMemObject(velX_buf);
+    clReleaseMemObject(velY_buf);
+    clReleaseMemObject(mass_buf);
+
+    clReleaseKernel(integrate_bodies_kernel);
+    clReleaseKernel(compute_forces_kernel);
+    clReleaseProgram(program);
+    clReleaseCommandQueue(queue);
+    clReleaseContext(context);
+}
+
 int main() {
+
+    //BodySOA
+
+    BodiesSOA bodiesSoa(n_bodies);
+    initialize_bodies_soa(bodiesSoa, n_bodies, center_mass, WIDTH, HEIGHT);
+    
+
+    size_t global_work_size[1];
+    size_t local_work_size[1];
+    
+
+
+    // OpenCL-Objekte
+    cl_context context;
+    cl_command_queue queue;
+    cl_program program;
+    cl_kernel compute_forces_kernel, integrate_bodies_kernel;
+    cl_mem posX_buf, posY_buf, accX_buf, accY_buf, velX_buf, velY_buf, mass_buf;
+    cl_int err;
+
+    // Nur 1x Aufruf!
+    init_opencl(n_bodies, global_work_size, local_work_size, bodiesSoa,
+                context, queue, program,
+                compute_forces_kernel, integrate_bodies_kernel,
+                posX_buf, posY_buf, accX_buf, accY_buf,
+                velX_buf, velY_buf, mass_buf);
+
+
     // Schriftart laden
     sf::Font font;
     if (!font.loadFromFile("../OpenSans-Bold.ttf")) {
@@ -241,9 +409,10 @@ int main() {
     fpsText.setFillColor(sf::Color::White);
     fpsText.setPosition(10, 5);
 
+    
     // Körper initialisieren
     std::vector<Body> bodies;
-    initialize_bodies(bodies, n_bodies, center_mass, WIDTH, HEIGHT);
+    // initialize_bodies(bodies, n_bodies, center_mass, WIDTH, HEIGHT);
 
     // Uhr zur FPS-Berechnung
     sf::Clock frameClock;
@@ -255,8 +424,15 @@ int main() {
         sf::Event e;
         while (window.pollEvent(e)) if (e.type == sf::Event::Closed) window.close();
 
-        compute_forces(bodies, G, eps, n_bodies);
-        integrate_bodies(bodies, dt, n_bodies);
+        // scalar version
+        // compute_forces(bodies, G, eps, n_bodies);
+        // integrate_bodies(bodies, dt, n_bodies);
+
+        run_opencl(bodiesSoa,
+                   posX_buf, posY_buf, accX_buf, accY_buf, velX_buf, velY_buf, mass_buf,
+                   dt, n_bodies, G, eps,
+                   queue, compute_forces_kernel, integrate_bodies_kernel,
+                   global_work_size, local_work_size, err);
 
         window.clear(sf::Color::Black);
 

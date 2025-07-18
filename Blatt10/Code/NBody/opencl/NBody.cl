@@ -1,45 +1,55 @@
-void kernel compute_forces(
-    global const std::vector<float>& posX, 
-    global const std::vector<float>& posY, 
-    global std::vector<float>& accX, 
-    global std::vector<float>& accY, 
-    global const std::vector<float>& mass,
-    const size_t n_bodies,
+__kernel void compute_forces(
+    __global const float* posX, 
+    __global const float* posY, 
+    __global float* accX, 
+    __global float* accY, 
+    __global const float* mass,
+    const uint n_bodies,
     const float G, 
-    const float eps){
-        const int i{get_global_id(0)};
+    const float eps)
+{
+    int i = get_global_id(0);
 
-        bodies[i].accX = 0.f;
-        bodies[i].accY = 0.f;
-    
-        float dx, dy, distSqr, dist, invDistCubed, f;
+    accX[i] = 0.f;
+    accY[i] = 0.f;
 
-        for (size_t j = 0; j < n_bodies; ++j) {
+    float dx, dy, distSqr, dist, invDistCubed, f;
 
-            if (i != j) {
-                Body& bi = bodies[i];
-                const Body& bj = bodies[j];
+    for (uint j = 0; j < n_bodies; ++j) {
+        if (i != j) {
 
-                // 1) Calculate distances in x and y to the other body
-                dx = bj.posX - bi.posX;
-                dy = bj.posY - bi.posY;
-                
-                // 2) Calculate the cubed inverse distance, including the softening factor eps
-                distSqr = dx * dx + dy * dy + eps * eps;
-                dist = std::sqrt(distSqr);
-                invDistCubed = 1.f / (dist * dist * dist);
-                
-                // 3) Calculate the force applied from body Bj to body Bi
-                f = G * bj.mass * invDistCubed;
+            dx = posX[j] - posX[i];
+            dy = posY[j] - posY[i];
 
-                // 4) Sum and update the acceleration in both directions for body Bi
-                bi.accX += dx * f;
-                bi.accY += dy * f;
-            }
+            distSqr = dx * dx + dy * dy + eps * eps;
+            dist = sqrt(distSqr);
+
+            invDistCubed = 1.f / (dist * dist * dist);
+
+            f = G * mass[j] * invDistCubed;
+
+            accX[i] += dx * f;
+            accY[i] += dy * f;
         }
+    }
 }
 
 
-void integrate_bodies(bodies, float dt){
 
+__kernel void integrate_bodies(
+    __global float* posX,
+    __global float* posY,
+    __global float* velX,
+    __global float* velY,
+    __global const float* accX,
+    __global const float* accY,
+    const float dt)
+{
+    int i = get_global_id(0);
+
+    velX[i] += accX[i] * dt;
+    velY[i] += accY[i] * dt;
+
+    posX[i] += velX[i] * dt;
+    posY[i] += velY[i] * dt;
 }

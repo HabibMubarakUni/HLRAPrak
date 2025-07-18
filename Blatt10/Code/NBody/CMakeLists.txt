@@ -6,7 +6,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_COMPILER /usr/bin/g++)
 
 # Suche nach SFML
-find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
+# find_package(SFML 2.5 COMPONENTS graphics window system REQUIRED)
+
+set(SFML_ROOT "$ENV{HOME}/SFML")
+include_directories(${SFML_ROOT}/include)
+link_directories(${SFML_ROOT}/lib64)
 
 # Füge deine Quell- und Header-Dateien hinzu
 add_executable(NBodySimulation
@@ -16,10 +20,11 @@ add_executable(NBodySimulation
 
 # SFML-Module einbinden
 target_link_libraries(NBodySimulation
+    OpenCL
     sfml-graphics
     sfml-window
     sfml-system
 )
 
-# Falls du Header in include/ hast
-target_include_directories(NBodySimulation PRIVATE include)
+include_directories(${SFML_ROOT}/include)
+set_target_properties(NBodySimulation PROPERTIES BUILD_RPATH ${SFML_ROOT}/lib64)

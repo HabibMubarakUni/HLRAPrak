@@ -10,6 +10,7 @@ set(CMAKE_CXX_COMPILER /usr/bin/g++)
 
 set(SFML_ROOT "$ENV{HOME}/SFML")
 include_directories(${SFML_ROOT}/include)
+include_directories(include)
 link_directories(${SFML_ROOT}/lib64)
 
 # Füge deine Quell- und Header-Dateien hinzu
@@ -26,5 +27,4 @@ target_link_libraries(NBodySimulation
     sfml-system
 )
 
-include_directories(${SFML_ROOT}/include)
 set_target_properties(NBodySimulation PROPERTIES BUILD_RPATH ${SFML_ROOT}/lib64)

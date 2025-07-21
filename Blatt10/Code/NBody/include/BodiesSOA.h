@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cstddef>
 
 struct BodiesSOA {
     std::vector<float> posX;
@@ -10,13 +11,7 @@ struct BodiesSOA {
     std::vector<float> accY;
     std::vector<float> mass;
 
-    BodiesSOA(size_t n) {
-        posX.resize(n);
-        posY.resize(n);
-        velX.resize(n);
-        velY.resize(n);
-        accX.resize(n);
-        accY.resize(n);
-        mass.resize(n);
-    }
+    BodiesSOA(size_t n);
+    
+    void add_body(float px, float py, float vx, float vy, float m);
 };

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/g++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I"/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt10/Code/NBody/include" -isystem /home/users3/lio/s3091627/SFML/include
+CXX_INCLUDES = -I/home/users8/wioo/s9292109/SFML/include -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt10/Code/NBody/include
 
-CXX_FLAGS = -std=gnu++17
+CXX_FLAGS = -O3 -DNDEBUG -std=gnu++17
 

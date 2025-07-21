@@ -7,14 +7,9 @@ set(CMAKE_DEPENDS_GENERATOR "Unix Makefiles")
 # The top level Makefile was generated from the following files:
 set(CMAKE_MAKEFILE_DEPENDS
   "CMakeCache.txt"
-  "/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt10/Code/NBody/CMakeLists.txt"
+  "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt10/Code/NBody/CMakeLists.txt"
   "CMakeFiles/3.30.8/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.30.8/CMakeSystem.cmake"
-  "/home/users3/lio/s3091627/SFML/lib64/cmake/SFML/SFMLConfig.cmake"
-  "/home/users3/lio/s3091627/SFML/lib64/cmake/SFML/SFMLConfigDependencies.cmake"
-  "/home/users3/lio/s3091627/SFML/lib64/cmake/SFML/SFMLConfigVersion.cmake"
-  "/home/users3/lio/s3091627/SFML/lib64/cmake/SFML/SFMLSharedTargets-release.cmake"
-  "/home/users3/lio/s3091627/SFML/lib64/cmake/SFML/SFMLSharedTargets.cmake"
   "/usr/share/cmake/Modules/CMakeCXXInformation.cmake"
   "/usr/share/cmake/Modules/CMakeCommonLanguageInclude.cmake"
   "/usr/share/cmake/Modules/CMakeGenericSystem.cmake"

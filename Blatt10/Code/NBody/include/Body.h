@@ -1,7 +1,4 @@
 #pragma once
-#include <cstddef>
-#include <cstdlib>
-#include <immintrin.h> // für _mm_malloc/_mm_free
 
 struct Body {
     // Position

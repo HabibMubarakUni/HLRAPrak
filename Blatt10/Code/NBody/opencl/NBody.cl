@@ -1,21 +1,24 @@
-__kernel void compute_forces(
-    __global const float* posX, 
-    __global const float* posY, 
-    __global float* accX, 
-    __global float* accY, 
-    __global const float* mass,
-    const uint n_bodies,
+void kernel compute_forces(
+    global const float* posX, 
+    global const float* posY, 
+    global float* accX, 
+    global float* accY, 
+    global const float* mass,
+    const int n_bodies,
     const float G, 
     const float eps)
 {
     int i = get_global_id(0);
+    if (i >= n_bodies) {
+        return;
+    }
 
     accX[i] = 0.f;
     accY[i] = 0.f;
 
     float dx, dy, distSqr, dist, invDistCubed, f;
 
-    for (uint j = 0; j < n_bodies; ++j) {
+    for (int j = 0; j < n_bodies; ++j) {
         if (i != j) {
 
             dx = posX[j] - posX[i];
@@ -23,7 +26,6 @@ __kernel void compute_forces(
 
             distSqr = dx * dx + dy * dy + eps * eps;
             dist = sqrt(distSqr);
-
             invDistCubed = 1.f / (dist * dist * dist);
 
             f = G * mass[j] * invDistCubed;
@@ -34,18 +36,20 @@ __kernel void compute_forces(
     }
 }
 
-
-
-__kernel void integrate_bodies(
-    __global float* posX,
-    __global float* posY,
-    __global float* velX,
-    __global float* velY,
-    __global const float* accX,
-    __global const float* accY,
+void kernel integrate_bodies(
+    global float* posX,
+    global float* posY,
+    global float* velX,
+    global float* velY,
+    global const float* accX,
+    global const float* accY,
+    const int n_bodies,
     const float dt)
 {
     int i = get_global_id(0);
+    if (i >= n_bodies) {
+        return;
+    }
 
     velX[i] += accX[i] * dt;
     velY[i] += accY[i] * dt;

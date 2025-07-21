@@ -1,4 +1,4 @@
-# Install script for directory: /home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt10/Code/NBody
+# Install script for directory: /home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt10/Code/NBody
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -12,7 +12,7 @@ if(NOT DEFINED CMAKE_INSTALL_CONFIG_NAME)
     string(REGEX REPLACE "^[^A-Za-z0-9_]+" ""
            CMAKE_INSTALL_CONFIG_NAME "${BUILD_TYPE}")
   else()
-    set(CMAKE_INSTALL_CONFIG_NAME "")
+    set(CMAKE_INSTALL_CONFIG_NAME "Release")
   endif()
   message(STATUS "Install configuration: \"${CMAKE_INSTALL_CONFIG_NAME}\"")
 endif()
@@ -57,6 +57,6 @@ endif()
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-  file(WRITE "/home/users3/lio/s3091627/Documents/HL Prak 2025/HLRAPrak/Blatt10/Code/NBody/build/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt10/Code/NBody/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

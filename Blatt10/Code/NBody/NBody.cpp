@@ -74,6 +74,10 @@ void integrate_bodies(std::vector<Body>& bodies, const float dt) {
         // Position aktualisieren
         bodies[i].posX += bodies[i].velX * dt;
         bodies[i].posY += bodies[i].velY * dt;
+
+        // Toroidales Verhalten (Wrap-around)
+        bodies[i].posX = std::fmod(bodies[i].posX + WIDTH, WIDTH);
+        bodies[i].posY = std::fmod(bodies[i].posY + HEIGHT, HEIGHT);
     }
 }
 

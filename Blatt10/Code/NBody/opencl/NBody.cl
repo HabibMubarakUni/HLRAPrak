@@ -56,4 +56,7 @@ void kernel integrate_bodies(
 
     posX[i] += velX[i] * dt;
     posY[i] += velY[i] * dt;
+
+    posX[i] = fmod(posX[i] + WIDTH, WIDTH);
+    posY[i] = fmod(posY[i] + HEIGHT, HEIGHT);
 }

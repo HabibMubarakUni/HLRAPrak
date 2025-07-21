@@ -1,6 +1,8 @@
 #include "../include/BodiesSOA.h"
 
-BodiesSOA::BodiesSOA(size_t n) {
+BodiesSOA::BodiesSOA() {};
+
+void BodiesSOA::reserve(size_t n) {
     posX.reserve(n);
     posY.reserve(n);
     velX.reserve(n);

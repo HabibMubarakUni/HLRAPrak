@@ -11,7 +11,9 @@ struct BodiesSOA {
     std::vector<float> accY;
     std::vector<float> mass;
 
-    BodiesSOA(size_t n);
+    BodiesSOA();
+
+    void reserve(size_t n);
     
     void add_body(float px, float py, float vx, float vy, float m);
 };

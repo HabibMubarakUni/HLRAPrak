@@ -90,13 +90,12 @@ float orbital_velocity_scalar(const float M, const float r) {
     return std::sqrt(1.0f * M / r); // G = 1.0 assumed
 }
 
-std::vector<Body> initialize_bodies(const size_t n_bodies, const float center_mass, const int width, const int height) {
+void initialize_bodies(std::vector<Body>& bodies, const size_t n_bodies, const float center_mass, const int width, const int height) {
     std::mt19937 rng(42);
     std::uniform_real_distribution<float> angle_dist(0.0f, 2.0f * M_PI);
     std::uniform_real_distribution<float> radius_dist(50.0f, std::min(width, height) / 2.f - 20.f);
     std::uniform_real_distribution<float> mass_dist(0.5f, 10.f);
 
-    std::vector<Body> bodies;
     bodies.reserve(n_bodies);
 
     // Schwerer Körper im Zentrum
@@ -120,17 +119,15 @@ std::vector<Body> initialize_bodies(const size_t n_bodies, const float center_ma
 
         bodies.emplace_back(x, y, vx, vy, mass);
     }
-
-    return bodies;
 }
 
-BodiesSOA initialize_bodies_soa(const size_t n_bodies, const float center_mass, const int width, const int height) {
+void initialize_bodies_soa(BodiesSOA& bodies_soa, const size_t n_bodies, const float center_mass, const int width, const int height) {
     std::mt19937 rng(42);
     std::uniform_real_distribution<float> angle_dist(0.0f, 2.0f * M_PI);
     std::uniform_real_distribution<float> radius_dist(50.0f, std::min(width, height) / 2.f - 20.f);
     std::uniform_real_distribution<float> mass_dist(0.5f, 10.f);
 
-    BodiesSOA bodies_soa(n_bodies);
+    bodies_soa.reserve(n_bodies);
 
     // Schwerer Körper im Zentrum
     bodies_soa.add_body(0.f, 0.f, 0.f, 0.f, center_mass);
@@ -153,8 +150,6 @@ BodiesSOA initialize_bodies_soa(const size_t n_bodies, const float center_mass, 
 
         bodies_soa.add_body(x, y, vx, vy, mass);
     }
-
-    return bodies_soa;
 }
 
 // void initialize_bodies_soa(BodiesSOA& bodies, const size_t n_bodies, float center_mass, int width, int height) {
@@ -448,10 +443,10 @@ int main() {
 
     // Körper initialisieren
     if (use_scalar_version) {
-        bodies = initialize_bodies(n_bodies, center_mass, WIDTH, HEIGHT);
+        initialize_bodies(bodies, n_bodies, center_mass, WIDTH, HEIGHT);
     }
     else {
-        bodies_soa = initialize_bodies_soa(n_bodies, center_mass, WIDTH, HEIGHT);
+        initialize_bodies_soa(bodies_soa, n_bodies, center_mass, WIDTH, HEIGHT);
     }
 
     // Haupt-Loop

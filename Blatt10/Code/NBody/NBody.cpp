@@ -13,10 +13,10 @@
 
 
 // Anzahl der Körper (kann geändert werden)
-size_t n_bodies{100}; // hier ändern
+size_t n_bodies{10000}; // hier ändern
 
 // Auswahl zwischen skalarem und OpenCL-Implementierung
-constexpr bool use_scalar_version{false}; // hier ändern 
+constexpr bool use_scalar_version{true}; // hier ändern 
 
 constexpr float TARGET_FPS{165.f};
 const sf::Time FRAME_DURATION = sf::seconds(1.f / TARGET_FPS);
@@ -73,8 +73,22 @@ void integrate_bodies(std::vector<Body>& bodies, const float dt) {
         bodies[i].posY += bodies[i].velY * dt;
 
         // Toroidales Verhalten an den Bildschirmrändern
-        bodies[i].posX = std::fmod(bodies[i].posX + WIDTH, WIDTH);
-        bodies[i].posY = std::fmod(bodies[i].posY + HEIGHT, HEIGHT);
+        const float floatWidth = static_cast<float>(WIDTH);
+        const float floatHeight = static_cast<float>(HEIGHT);
+
+        if (bodies[i].posX > (floatWidth / 2.f)) {
+            bodies[i].posX -= floatWidth;
+        }
+        else if (bodies[i].posX < -(floatWidth / 2.f)) {
+            bodies[i].posX += floatWidth;
+        }
+
+        if (bodies[i].posY > (floatHeight / 2.f)) {
+            bodies[i].posY -= floatHeight;
+        }
+        else if (bodies[i].posY < -(floatHeight / 2.f)) {
+            bodies[i].posY += floatHeight;
+        }
     }
 }
 

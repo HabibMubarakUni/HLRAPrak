@@ -56,6 +56,20 @@ void kernel integrate_bodies(
     posX[i] += velX[i] * dt;
     posY[i] += velY[i] * dt;
 
-    posX[i] = fmod(posX[i] + WIDTH, WIDTH);
-    posY[i] = fmod(posY[i] + HEIGHT, HEIGHT);
+    const float floatWidth = (float)WIDTH;
+    const float floatHeight = (float)HEIGHT;
+
+    if (posX[i] > (floatWidth / 2.f)) {
+        posX[i] -= floatWidth;
+    }
+    else if (posX[i] < -(floatWidth / 2.f)) {
+        posX[i] += floatWidth;
+    }
+
+    if (posY[i] > (floatHeight / 2.f)) {
+        posY[i] -= floatHeight;
+    }
+    else if (posY[i] < -(floatHeight / 2.f)) {
+        posY[i] += floatHeight;
+    }
 }

@@ -179,7 +179,8 @@ int main() {
     float lastFPS = 0.f;
 
     if (!use_scalar_version) {
-        n_bodies = ((n_bodies + 15) / 16) * 16; // Nächstgrößere Nummer, die durch 16 teilbar ist
+        // Nächstgrößere Zahl, die durch 16 teilbar ist
+        n_bodies = ((n_bodies + static_cast<size_t>(15)) / static_cast<size_t>(16)) * static_cast<size_t>(16); 
     }
     const int N = static_cast<int>(n_bodies);
 

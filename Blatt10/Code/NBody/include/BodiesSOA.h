@@ -13,7 +13,7 @@ struct BodiesSOA {
 
     BodiesSOA();
 
-    void reserve(size_t n);
+    void reserve(const size_t n);
     
-    void add_body(float px, float py, float vx, float vy, float m);
+    void add_body(const float px, const float py, const float vx, const float vy, const float m);
 };

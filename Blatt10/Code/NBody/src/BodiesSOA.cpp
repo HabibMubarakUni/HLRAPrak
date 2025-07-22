@@ -2,7 +2,7 @@
 
 BodiesSOA::BodiesSOA() {};
 
-void BodiesSOA::reserve(size_t n) {
+void BodiesSOA::reserve(const size_t n) {
     posX.reserve(n);
     posY.reserve(n);
     velX.reserve(n);
@@ -12,7 +12,7 @@ void BodiesSOA::reserve(size_t n) {
     mass.reserve(n);
 }
 
-void BodiesSOA::add_body(float px, float py, float vx, float vy, float m) {
+void BodiesSOA::add_body(const float px, const float py, const float vx, const float vy, const float m) {
     posX.push_back(px);
     posY.push_back(py);
     velX.push_back(vx);

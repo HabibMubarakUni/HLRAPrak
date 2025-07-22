@@ -17,5 +17,5 @@ struct Body {
     float mass;
 
     // Konstruktor
-    Body(float px, float py, float vx, float vy, float m);
+    Body(const float px, const float py, const float vx, const float vy, const float m);
 };

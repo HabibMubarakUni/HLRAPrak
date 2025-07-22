@@ -1,3 +1,4 @@
+#define CL_TARGET_OPENCL_VERSION 120
 #include "include/Body.h"
 #include "include/BodiesSOA.h"
 #include <fstream>
@@ -7,59 +8,52 @@
 #include <cstdlib>
 #include <algorithm> // für std::min
 #include <random> // um Bodies zu initialisieren
-#include <immintrin.h> // für _mm_malloc/_mm_free
 #include <SFML/Graphics.hpp>
-
-#define CL_TARGET_OPENCL_VERSION 120
-
 #include <gegl-0.4/opencl/cl.h>
 
 
-size_t n_bodies = 10000; // hier ändern
-constexpr bool use_scalar_version = false; // hier ändern 
+size_t n_bodies{100}; // hier ändern
+constexpr bool use_scalar_version{false}; // hier ändern 
 
-constexpr float G = 1.f;
-constexpr float dt = .1f;
-constexpr float eps = 1e-1f;
-constexpr float center_mass = 1000.f;
-
-constexpr float TARGET_FPS = 165.f;
+constexpr float TARGET_FPS{165.f};
 const sf::Time FRAME_DURATION = sf::seconds(1.f / TARGET_FPS);
 
 // Fenstergröße
-constexpr int WIDTH = 1980, HEIGHT = 1080;
+constexpr int WIDTH{1980};
+constexpr int HEIGHT{1080};
 
 
-// Updates für Bodies
+constexpr float G{1.f};
+constexpr float dt{.1f};
+constexpr float eps{1e-1f};
+constexpr float center_mass{1000.f};
+
+
 void compute_forces(std::vector<Body>& bodies, const float G, const float eps) {
     for (size_t i = 0; i < bodies.size(); ++i) {
         bodies[i].accX = 0.f;
         bodies[i].accY = 0.f;
     }
-    float dx, dy, distSqr, dist, invDistCubed, f;
 
     for (size_t i = 0; i < bodies.size(); ++i) {
         for (size_t j = 0; j < bodies.size(); ++j) {
 
             if (i != j) {
-                Body& bi = bodies[i];
-                const Body& bj = bodies[j];
-
-                // 1) Calculate distances in x and y to the other body
-                dx = bj.posX - bi.posX;
-                dy = bj.posY - bi.posY;
+                // 1) Berechne die Distanzen in x- und y-Richtung zum anderen Körper
+                const float dx{bodies[j].posX - bodies[i].posX};
+                const float dy{bodies[j].posY - bodies[i].posY};
                 
-                // 2) Calculate the cubed inverse distance, including the softening factor eps
-                distSqr = dx * dx + dy * dy + eps * eps;
-                dist = std::sqrt(distSqr);
-                invDistCubed = 1.f / (dist * dist * dist);
+                // 2) Berechne die kubisch inverse Distanz unter Berücksichtigung des Softening-Faktors eps
+                const float distSqr{dx * dx + dy * dy + eps * eps};
+                const float dist{std::sqrt(distSqr)};
+                const float invDistCubed{1.f / (dist * dist * dist)};
                 
-                // 3) Calculate the force applied from body Bj to body Bi
-                f = G * bj.mass * invDistCubed;
+                // 3) Berechne die Kraft, die von Körper Bj auf Körper Bi wirkt
+                const float f{G * bodies[j].mass * invDistCubed};
 
-                // 4) Sum and update the acceleration in both directions for body Bi
-                bi.accX += dx * f;
-                bi.accY += dy * f;
+                // 4) Summiere und aktualisiere die Beschleunigung in beide Richtungen für Körper Bi
+                bodies[i].accX += dx * f;
+                bodies[i].accY += dy * f;
             }
         }
     }
@@ -75,14 +69,14 @@ void integrate_bodies(std::vector<Body>& bodies, const float dt) {
         bodies[i].posX += bodies[i].velX * dt;
         bodies[i].posY += bodies[i].velY * dt;
 
-        // Toroidales Verhalten (Wrap-around)
+        // Toroidales Verhalten
         bodies[i].posX = std::fmod(bodies[i].posX + WIDTH, WIDTH);
         bodies[i].posY = std::fmod(bodies[i].posY + HEIGHT, HEIGHT);
     }
 }
 
 sf::Color mass_to_color(const float m) {
-    float norm = std::min(1.0f, m / 10.0f);
+    const float norm{std::min(1.0f, m / 10.0f)};
     return sf::Color(255 * norm, 50, 255 * (1 - norm));
 }
 
@@ -91,10 +85,10 @@ float orbital_velocity_scalar(const float M, const float r) {
 }
 
 void initialize_bodies(std::vector<Body>& bodies, const size_t n_bodies, const float center_mass, const int width, const int height) {
-    std::mt19937 rng(42);
-    std::uniform_real_distribution<float> angle_dist(0.0f, 2.0f * M_PI);
-    std::uniform_real_distribution<float> radius_dist(50.0f, std::min(width, height) / 2.f - 20.f);
-    std::uniform_real_distribution<float> mass_dist(0.5f, 10.f);
+    std::mt19937 rng{42};
+    std::uniform_real_distribution<float> angle_dist{0.0f, 2.0f * M_PI};
+    std::uniform_real_distribution<float> radius_dist{50.0f, std::min(width, height) / 2.f - 20.f};
+    std::uniform_real_distribution<float> mass_dist{0.5f, 10.f};
 
     bodies.reserve(n_bodies);
 
@@ -102,30 +96,28 @@ void initialize_bodies(std::vector<Body>& bodies, const size_t n_bodies, const f
     bodies.emplace_back(0.f, 0.f, 0.f, 0.f, center_mass);
 
     // Zufällige Körper
-    float angle,r,mass,x,y,v,vx,vy;
-    
     for (size_t i = 1; i < n_bodies; ++i) {
-        angle = angle_dist(rng);
-        r = radius_dist(rng);
-        mass = mass_dist(rng);
+        const float angle{angle_dist(rng)};
+        const float r{radius_dist(rng)};
+        const float mass{mass_dist(rng)};
 
-        x = r * std::cos(angle);
-        y = r * std::sin(angle);
+        const float x{r * std::cos(angle)};
+        const float y{r * std::sin(angle)};
 
         // Kreisbahn-Geschwindigkeit
-        v = orbital_velocity_scalar(center_mass, r);
-        vx = -v * std::sin(angle);
-        vy = v * std::cos(angle);
+        const float v{orbital_velocity_scalar(center_mass, r)};
+        const float vx{-v * std::sin(angle)};
+        const float vy{v * std::cos(angle)};
 
         bodies.emplace_back(x, y, vx, vy, mass);
     }
 }
 
 void initialize_bodies_soa(BodiesSOA& bodies_soa, const size_t n_bodies, const float center_mass, const int width, const int height) {
-    std::mt19937 rng(42);
-    std::uniform_real_distribution<float> angle_dist(0.0f, 2.0f * M_PI);
-    std::uniform_real_distribution<float> radius_dist(50.0f, std::min(width, height) / 2.f - 20.f);
-    std::uniform_real_distribution<float> mass_dist(0.5f, 10.f);
+    std::mt19937 rng{42};
+    std::uniform_real_distribution<float> angle_dist{0.0f, 2.0f * M_PI};
+    std::uniform_real_distribution<float> radius_dist{50.0f, std::min(width, height) / 2.f - 20.f};
+    std::uniform_real_distribution<float> mass_dist{0.5f, 10.f};
 
     bodies_soa.reserve(n_bodies);
 
@@ -133,34 +125,32 @@ void initialize_bodies_soa(BodiesSOA& bodies_soa, const size_t n_bodies, const f
     bodies_soa.add_body(0.f, 0.f, 0.f, 0.f, center_mass);
 
     // Zufällige Körper
-    float angle,r,mass,x,y,v,vx,vy;
-
     for (size_t i = 1; i < n_bodies; ++i) {
-        angle = angle_dist(rng);
-        r = radius_dist(rng);
-        mass = mass_dist(rng);
+        const float angle{angle_dist(rng)};
+        const float r{radius_dist(rng)};
+        const float mass{mass_dist(rng)};
 
-        x = r * std::cos(angle);
-        y = r * std::sin(angle);
+        const float x{r * std::cos(angle)};
+        const float y{r * std::sin(angle)};
 
         // Kreisbahn-Geschwindigkeit
-        v = orbital_velocity_scalar(center_mass, r);
-        vx = -v * std::sin(angle);
-        vy = v * std::cos(angle);
+        const float v{orbital_velocity_scalar(center_mass, r)};
+        const float vx{-v * std::sin(angle)};
+        const float vy{v * std::cos(angle)};
 
         bodies_soa.add_body(x, y, vx, vy, mass);
     }
 }
 
 std::string readKernelSource(const char* filename) {
-    std::ifstream file(filename);
+    std::ifstream file{filename};
     std::stringstream buffer;
     buffer << file.rdbuf();
     return buffer.str();
 }
 
 
-void checkError(cl_int err, const char* operation) {
+void checkError(const cl_int err, const char* operation) {
     if (err != CL_SUCCESS) {
         std::cerr << "Error during operation '" << operation << "': " << err << std::endl;
         exit(1);
@@ -188,7 +178,10 @@ int main() {
     sf::Clock fpsClock;
     float lastFPS = 0.f;
 
-    n_bodies = ((n_bodies + 15) / 16) * 16; // Nächstgrößere Nummer, die durch 16 teilbar ist
+    if (!use_scalar_version) {
+        n_bodies = ((n_bodies + 15) / 16) * 16; // Nächstgrößere Nummer, die durch 16 teilbar ist
+    }
+    const int N = static_cast<int>(n_bodies);
 
     cl_int err;
     cl_uint platformCount;
@@ -200,8 +193,8 @@ int main() {
     cl_program program;
     cl_kernel compute_forces_kernel, integrate_bodies_kernel;
     cl_mem posX_buf, posY_buf, accX_buf, accY_buf, velX_buf, velY_buf, mass_buf; //! vllt ändern
-    size_t global_work_size[1] = {n_bodies};
-    size_t local_work_size[1] = {16};
+    const size_t global_work_size[1] = {N};
+    const size_t local_work_size[1] = {16};
 
     std::vector<Body> bodies;
     BodiesSOA bodies_soa;
@@ -225,22 +218,22 @@ int main() {
         queue = clCreateCommandQueue(context, device, 0, &err);
         checkError(err, "clCreateCommandQueue");
 
-        posX_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * n_bodies, bodies_soa.posX.data(), &err);
+        posX_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * N, bodies_soa.posX.data(), &err);
         checkError(err, "clCreateBuffer (posX_buf)");
-        posY_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * n_bodies, bodies_soa.posY.data(), &err);
+        posY_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * N, bodies_soa.posY.data(), &err);
         checkError(err, "clCreateBuffer (posY_buf)");
-        velX_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * n_bodies, bodies_soa.velX.data(), &err);
+        velX_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * N, bodies_soa.velX.data(), &err);
         checkError(err, "clCreateBuffer (velX_buf)");
-        velY_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * n_bodies, bodies_soa.velY.data(), &err);
+        velY_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * N, bodies_soa.velY.data(), &err);
         checkError(err, "clCreateBuffer (velY_buf)");
-        accX_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * n_bodies, bodies_soa.accX.data(), &err);
+        accX_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * N, bodies_soa.accX.data(), &err);
         checkError(err, "clCreateBuffer (accX_buf)");
-        accY_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * n_bodies, bodies_soa.accY.data(), &err);
+        accY_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * N, bodies_soa.accY.data(), &err);
         checkError(err, "clCreateBuffer (accY_buf)");
-        mass_buf = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * n_bodies, bodies_soa.mass.data(), &err);
+        mass_buf = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * N, bodies_soa.mass.data(), &err);
         checkError(err, "clCreateBuffer (mass_buf)");
 
-        std::string sourceStr = readKernelSource("../opencl/NBody.cl");
+        const std::string sourceStr = readKernelSource("../opencl/NBody.cl");
         const char* source = sourceStr.c_str();
         program = clCreateProgramWithSource(context, 1, &source, NULL, &err);
         checkError(err, "clCreateProgramWithSource");
@@ -295,8 +288,8 @@ int main() {
             checkError(err, "clSetKernelArg (accY_buf)");
             err = clSetKernelArg(compute_forces_kernel, 4, sizeof(cl_mem), &mass_buf);
             checkError(err, "clSetKernelArg (mass_buf)");
-            err = clSetKernelArg(compute_forces_kernel, 5, sizeof(int), &n_bodies);
-            checkError(err, "clSetKernelArg (n_bodies)");
+            err = clSetKernelArg(compute_forces_kernel, 5, sizeof(int), &N);
+            checkError(err, "clSetKernelArg (N)");
             err = clSetKernelArg(compute_forces_kernel, 6, sizeof(float), &G);
             checkError(err, "clSetKernelArg (G)");
             err = clSetKernelArg(compute_forces_kernel, 7, sizeof(float), &eps);
@@ -315,8 +308,8 @@ int main() {
             checkError(err, "clSetKernelArg (accX_buf)");
             err = clSetKernelArg(integrate_bodies_kernel, 5, sizeof(cl_mem), &accY_buf);
             checkError(err, "clSetKernelArg (accY_buf)");
-            err = clSetKernelArg(integrate_bodies_kernel, 6, sizeof(float), &n_bodies);
-            checkError(err, "clSetKernelArg (n_bodies)");
+            err = clSetKernelArg(integrate_bodies_kernel, 6, sizeof(float), &N);
+            checkError(err, "clSetKernelArg (N)");
             err = clSetKernelArg(integrate_bodies_kernel, 7, sizeof(float), &dt);
             checkError(err, "clSetKernelArg (dt)");
             err = clSetKernelArg(integrate_bodies_kernel, 8, sizeof(float), &WIDTH);
@@ -333,15 +326,15 @@ int main() {
             clFinish(queue);
 
             //! Read results back
-            err = clEnqueueReadBuffer(queue, posX_buf, CL_TRUE, 0, sizeof(float) * n_bodies, bodies_soa.posX.data(), 0, NULL, NULL);
+            err = clEnqueueReadBuffer(queue, posX_buf, CL_TRUE, 0, sizeof(float) * N, bodies_soa.posX.data(), 0, NULL, NULL);
             checkError(err, "clEnqueueReadBuffer posX");
-            err = clEnqueueReadBuffer(queue, posY_buf, CL_TRUE, 0, sizeof(float) * n_bodies, bodies_soa.posY.data(), 0, NULL, NULL);
+            err = clEnqueueReadBuffer(queue, posY_buf, CL_TRUE, 0, sizeof(float) * N, bodies_soa.posY.data(), 0, NULL, NULL);
             checkError(err, "clEnqueueReadBuffer posY");
 
             window.clear(sf::Color::Black);
 
             //! Draw bodies from SOA
-            for (size_t i = 0; i < n_bodies; ++i) {
+            for (size_t i = 0; i < N; ++i) {
                 sf::CircleShape circle(bodies_soa.mass[i] > 50.0f ? 6 : 2);
                 circle.setFillColor(mass_to_color(bodies_soa.mass[i]));
                 circle.setPosition(WIDTH / 2 + bodies_soa.posX[i], HEIGHT / 2 + bodies_soa.posY[i]);
@@ -349,12 +342,6 @@ int main() {
                 window.draw(circle);
             }
         }
-
-        // run_opencl(bodiesSoa,
-        //            posX_buf, posY_buf, accX_buf, accY_buf, velX_buf, velY_buf, mass_buf,
-        //            dt, n_bodies, G, eps,
-        //            queue, compute_forces_kernel, integrate_bodies_kernel,
-        //            global_work_size, local_work_size, err);
 
         //! FPS calculation and display
         float fpsElapsed = fpsClock.restart().asSeconds();

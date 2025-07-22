@@ -8,7 +8,7 @@ void kernel compute_forces(
     const float G, 
     const float eps)
 {
-    int i = get_global_id(0);
+    const int i = get_global_id(0);
     if (i >= n_bodies) {
         return;
     }
@@ -16,19 +16,16 @@ void kernel compute_forces(
     accX[i] = 0.f;
     accY[i] = 0.f;
 
-    float dx, dy, distSqr, dist, invDistCubed, f;
-
     for (int j = 0; j < n_bodies; ++j) {
         if (i != j) {
+            const float dx = posX[j] - posX[i];
+            const float dy = posY[j] - posY[i];
 
-            dx = posX[j] - posX[i];
-            dy = posY[j] - posY[i];
+            const float distSqr = dx * dx + dy * dy + eps * eps;
+            const float dist = sqrt(distSqr);
+            const float invDistCubed = 1.f / (dist * dist * dist);
 
-            distSqr = dx * dx + dy * dy + eps * eps;
-            dist = sqrt(distSqr);
-            invDistCubed = 1.f / (dist * dist * dist);
-
-            f = G * mass[j] * invDistCubed;
+            const float f = G * mass[j] * invDistCubed;
 
             accX[i] += dx * f;
             accY[i] += dy * f;
@@ -48,7 +45,7 @@ void kernel integrate_bodies(
     const int WIDTH,
     const int HEIGHT)
 {
-    int i = get_global_id(0);
+    const int i = get_global_id(0);
     if (i >= n_bodies) {
         return;
     }

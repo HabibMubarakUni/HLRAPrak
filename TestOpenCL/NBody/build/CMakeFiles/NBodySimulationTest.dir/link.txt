@@ -1,0 +1,1 @@
+/usr/bin/g++ CMakeFiles/NBodySimulationTest.dir/NBodyTest.cpp.o CMakeFiles/NBodySimulationTest.dir/src/BodiesSOA.cpp.o -o NBodySimulationTest  -lOpenCL

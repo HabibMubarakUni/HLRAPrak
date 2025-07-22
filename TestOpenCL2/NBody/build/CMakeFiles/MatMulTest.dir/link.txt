@@ -1,0 +1,1 @@
+/usr/bin/g++ CMakeFiles/MatMulTest.dir/MatMulTest.cpp.o -o MatMulTest  -lOpenCL

@@ -1,5 +1,5 @@
 /*
-* @author Habib Mubarak, Eraycan Gökcan
+* @author Habib Mubarak (Matrikelnummer 6627597), Eraycan Gökcan (Matrikelnummer 7000210)
 * @date 2025-07-22
 */
 

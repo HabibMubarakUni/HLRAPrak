@@ -1,3 +1,8 @@
+/*
+* @author Habib Mubarak, Eraycan Gökcan
+* @date 2025-07-22
+*/
+
 #define CL_TARGET_OPENCL_VERSION 120
 #include "include/Body.h"
 #include "include/BodiesSOA.h"
@@ -72,7 +77,7 @@ void integrate_bodies(std::vector<Body>& bodies, const float dt) {
         bodies[i].posX += bodies[i].velX * dt;
         bodies[i].posY += bodies[i].velY * dt;
 
-        
+
         // Toroidales Verhalten an den Bildschirmrändern
         const float floatWidth = static_cast<float>(WIDTH);
         const float floatHeight = static_cast<float>(HEIGHT);

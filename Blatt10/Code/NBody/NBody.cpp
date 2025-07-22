@@ -13,10 +13,10 @@
 
 
 // Anzahl der Körper (kann geändert werden)
-size_t n_bodies{10000}; // hier ändern
+size_t n_bodies{2976}; // hier ändern
 
 // Auswahl zwischen skalarem und OpenCL-Implementierung
-constexpr bool use_scalar_version{true}; // hier ändern 
+constexpr bool use_scalar_version{false}; // hier ändern 
 
 constexpr float TARGET_FPS{165.f};
 const sf::Time FRAME_DURATION = sf::seconds(1.f / TARGET_FPS);
@@ -72,6 +72,7 @@ void integrate_bodies(std::vector<Body>& bodies, const float dt) {
         bodies[i].posX += bodies[i].velX * dt;
         bodies[i].posY += bodies[i].velY * dt;
 
+        
         // Toroidales Verhalten an den Bildschirmrändern
         const float floatWidth = static_cast<float>(WIDTH);
         const float floatHeight = static_cast<float>(HEIGHT);

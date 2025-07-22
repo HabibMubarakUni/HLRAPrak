@@ -6,5 +6,5 @@ CXX_DEFINES =
 
 CXX_INCLUDES = -I/home/users8/wioo/s9292109/SFML/include -I/home/users8/wioo/s9292109/Desktop/HLRA_Codes/HLRAPrak/Blatt10/Code/NBody/include
 
-CXX_FLAGS = -O3 -DNDEBUG -std=gnu++17
+CXX_FLAGS = -O3 -DNDEBUG -O3 -std=gnu++17
 

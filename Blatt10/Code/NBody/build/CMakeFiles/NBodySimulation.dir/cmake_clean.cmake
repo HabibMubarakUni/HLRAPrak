@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/NBodySimulation.dir/NBody.cpp.o"
   "CMakeFiles/NBodySimulation.dir/NBody.cpp.o.d"
+  "CMakeFiles/NBodySimulation.dir/src/BodiesSOA.cpp.o"
+  "CMakeFiles/NBodySimulation.dir/src/BodiesSOA.cpp.o.d"
   "CMakeFiles/NBodySimulation.dir/src/Body.cpp.o"
   "CMakeFiles/NBodySimulation.dir/src/Body.cpp.o.d"
   "NBodySimulation"

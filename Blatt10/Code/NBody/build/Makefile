@@ -153,6 +153,30 @@ NBody.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/NBodySimulation.dir/build.make CMakeFiles/NBodySimulation.dir/NBody.cpp.s
 .PHONY : NBody.cpp.s
 
+src/BodiesSOA.o: src/BodiesSOA.cpp.o
+.PHONY : src/BodiesSOA.o
+
+# target to build an object file
+src/BodiesSOA.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NBodySimulation.dir/build.make CMakeFiles/NBodySimulation.dir/src/BodiesSOA.cpp.o
+.PHONY : src/BodiesSOA.cpp.o
+
+src/BodiesSOA.i: src/BodiesSOA.cpp.i
+.PHONY : src/BodiesSOA.i
+
+# target to preprocess a source file
+src/BodiesSOA.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NBodySimulation.dir/build.make CMakeFiles/NBodySimulation.dir/src/BodiesSOA.cpp.i
+.PHONY : src/BodiesSOA.cpp.i
+
+src/BodiesSOA.s: src/BodiesSOA.cpp.s
+.PHONY : src/BodiesSOA.s
+
+# target to generate assembly for a file
+src/BodiesSOA.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/NBodySimulation.dir/build.make CMakeFiles/NBodySimulation.dir/src/BodiesSOA.cpp.s
+.PHONY : src/BodiesSOA.cpp.s
+
 src/Body.o: src/Body.cpp.o
 .PHONY : src/Body.o
 
@@ -189,6 +213,9 @@ help:
 	@echo "... NBody.o"
 	@echo "... NBody.i"
 	@echo "... NBody.s"
+	@echo "... src/BodiesSOA.o"
+	@echo "... src/BodiesSOA.i"
+	@echo "... src/BodiesSOA.s"
 	@echo "... src/Body.o"
 	@echo "... src/Body.i"
 	@echo "... src/Body.s"

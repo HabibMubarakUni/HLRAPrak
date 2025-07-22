@@ -79,8 +79,8 @@ void integrate_bodies(std::vector<Body>& bodies, const float dt) {
 
 
         // Toroidales Verhalten an den Bildschirmrändern
-        const float floatWidth = static_cast<float>(WIDTH);
-        const float floatHeight = static_cast<float>(HEIGHT);
+        const float floatWidth{static_cast<float>(WIDTH)};
+        const float floatHeight{static_cast<float>(HEIGHT)};
 
         if (bodies[i].posX > (floatWidth / 2.f)) {
             bodies[i].posX -= floatWidth;

@@ -7,12 +7,15 @@
 #include <cmath>
 #include <cstdlib>
 #include <algorithm> // für std::min
-#include <random> // um Bodies zu initialisieren
+#include <random> // um Körper zu initialisieren
 #include <SFML/Graphics.hpp>
 #include <gegl-0.4/opencl/cl.h>
 
 
+// Anzahl der Körper (kann geändert werden)
 size_t n_bodies{100}; // hier ändern
+
+// Auswahl zwischen skalarem und OpenCL-Implementierung
 constexpr bool use_scalar_version{false}; // hier ändern 
 
 constexpr float TARGET_FPS{165.f};
@@ -30,6 +33,7 @@ constexpr float center_mass{1000.f};
 
 
 void compute_forces(std::vector<Body>& bodies, const float G, const float eps) {
+    // Beschleunigungen auf 0 setzen
     for (size_t i = 0; i < bodies.size(); ++i) {
         bodies[i].accX = 0.f;
         bodies[i].accY = 0.f;
@@ -37,7 +41,6 @@ void compute_forces(std::vector<Body>& bodies, const float G, const float eps) {
 
     for (size_t i = 0; i < bodies.size(); ++i) {
         for (size_t j = 0; j < bodies.size(); ++j) {
-
             if (i != j) {
                 // 1) Berechne die Distanzen in x- und y-Richtung zum anderen Körper
                 const float dx{bodies[j].posX - bodies[i].posX};
@@ -69,7 +72,7 @@ void integrate_bodies(std::vector<Body>& bodies, const float dt) {
         bodies[i].posX += bodies[i].velX * dt;
         bodies[i].posY += bodies[i].velY * dt;
 
-        // Toroidales Verhalten
+        // Toroidales Verhalten an den Bildschirmrändern
         bodies[i].posX = std::fmod(bodies[i].posX + WIDTH, WIDTH);
         bodies[i].posY = std::fmod(bodies[i].posY + HEIGHT, HEIGHT);
     }
@@ -104,7 +107,7 @@ void initialize_bodies(std::vector<Body>& bodies, const size_t n_bodies, const f
         const float x{r * std::cos(angle)};
         const float y{r * std::sin(angle)};
 
-        // Kreisbahn-Geschwindigkeit
+        // Kreisbahn-Geschwindigkeit berechnen
         const float v{orbital_velocity_scalar(center_mass, r)};
         const float vx{-v * std::sin(angle)};
         const float vy{v * std::cos(angle)};
@@ -133,7 +136,7 @@ void initialize_bodies_soa(BodiesSOA& bodies_soa, const size_t n_bodies, const f
         const float x{r * std::cos(angle)};
         const float y{r * std::sin(angle)};
 
-        // Kreisbahn-Geschwindigkeit
+        // Kreisbahn-Geschwindigkeit berechnen
         const float v{orbital_velocity_scalar(center_mass, r)};
         const float vx{-v * std::sin(angle)};
         const float vy{v * std::cos(angle)};
@@ -159,7 +162,7 @@ void checkError(const cl_int err, const char* operation) {
 
 int main() {
     // Fenster erstellen
-    sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "N-Body Simulation");
+    sf::RenderWindow window{sf::VideoMode(WIDTH, HEIGHT), "N-Body Simulation"};
 
     // Schriftart laden
     sf::Font font;
@@ -169,21 +172,22 @@ int main() {
     }
 
     // FPS Text vorbereiten
-    sf::Text fpsText("", font, 18);
+    sf::Text fpsText{"", font, 18};
     fpsText.setFillColor(sf::Color::White);
     fpsText.setPosition(10, 5);
 
-    // Uhr zur FPS-Berechnung
+    // Uhren zur FPS-Berechnung
     sf::Clock frameClock;
     sf::Clock fpsClock;
-    float lastFPS = 0.f;
+    float lastFPS{0.f};
 
     if (!use_scalar_version) {
-        // Nächstgrößere Zahl, die durch 16 teilbar ist
+        // Anzahl der Körper auf nächstes Vielfaches von 16 aufrunden (für OpenCL Worksize)
         n_bodies = ((n_bodies + static_cast<size_t>(15)) / static_cast<size_t>(16)) * static_cast<size_t>(16); 
     }
-    const int N = static_cast<int>(n_bodies);
+    const int N{static_cast<int>(n_bodies)};
 
+    // OpenCL-Variablen deklarieren
     cl_int err;
     cl_uint platformCount;
     cl_platform_id platform;
@@ -193,32 +197,36 @@ int main() {
     cl_command_queue queue;
     cl_program program;
     cl_kernel compute_forces_kernel, integrate_bodies_kernel;
-    cl_mem posX_buf, posY_buf, accX_buf, accY_buf, velX_buf, velY_buf, mass_buf; //! vllt ändern
+    cl_mem posX_buf, posY_buf, accX_buf, accY_buf, velX_buf, velY_buf, mass_buf;
     const size_t global_work_size[1] = {N};
     const size_t local_work_size[1] = {16};
 
     std::vector<Body> bodies;
     BodiesSOA bodies_soa;
 
-    // Körper initialisieren
+    // Körper initialisieren, je nach Variante
     if (use_scalar_version) {
         initialize_bodies(bodies, n_bodies, center_mass, WIDTH, HEIGHT);
     }
     else {
+        // SOA Initialisierung
         initialize_bodies_soa(bodies_soa, n_bodies, center_mass, WIDTH, HEIGHT);
 
+        // Plattform und Gerät abrufen - Informationen über die Plattform erhalten / Gerät für Berechnungen auswählen
         err = clGetPlatformIDs(1, &platform, &platformCount);
         checkError(err, "clGetPlatformIDs");
-
         err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 1, &device, &deviceCount);
         checkError(err, "clGetDeviceIDs");
 
+        // Kontext erstellen, in dem das Programm läuft
         context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
         checkError(err, "clCreateContext");
 
+        // Kommando-Warteschlange erstellen
         queue = clCreateCommandQueue(context, device, 0, &err);
         checkError(err, "clCreateCommandQueue");
 
+        // Speicher-Puffer erstellen und mit Daten befüllen
         posX_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * N, bodies_soa.posX.data(), &err);
         checkError(err, "clCreateBuffer (posX_buf)");
         posY_buf = clCreateBuffer(context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, sizeof(float) * N, bodies_soa.posY.data(), &err);
@@ -234,11 +242,13 @@ int main() {
         mass_buf = clCreateBuffer(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(float) * N, bodies_soa.mass.data(), &err);
         checkError(err, "clCreateBuffer (mass_buf)");
 
-        const std::string sourceStr = readKernelSource("../opencl/NBody.cl");
-        const char* source = sourceStr.c_str();
+        // Programm erstellen - ein OpenCL-Objekt, Input ist die NBody.cl Datei mit den Haupt-Kernels
+        const std::string sourceStr{readKernelSource("../opencl/NBody.cl")};
+        const char* source{sourceStr.c_str()};
         program = clCreateProgramWithSource(context, 1, &source, NULL, &err);
         checkError(err, "clCreateProgramWithSource");
 
+        // Programm bauen und auf Fehler prüfen
         err = clBuildProgram(program, 1, &device, NULL, NULL, NULL);
         if (err != CL_SUCCESS) {
             size_t log_size;
@@ -250,25 +260,28 @@ int main() {
             exit(1);
         }
 
+        // Kernel erstellen (mit dem Kernel-Programm als Argument)
         compute_forces_kernel = clCreateKernel(program, "compute_forces", &err);
         checkError(err, "clCreateKernel (compute_forces)");
         integrate_bodies_kernel = clCreateKernel(program, "integrate_bodies", &err);
         checkError(err, "clCreateKernel (integrate_bodies)");
-
     }
 
 
-    // Haupt-Loop
+    // Haupt-Loop: läuft solange das Fenster geöffnet ist
     while (window.isOpen()) {
         sf::Event e;
         while (window.pollEvent(e)) if (e.type == sf::Event::Closed) window.close();
 
         if (use_scalar_version) {
+            // Kräfte berechnen und Körper integrieren (Skalar-Version)
             compute_forces(bodies, G, eps);
             integrate_bodies(bodies, dt);
 
+            // Fenster leeren
             window.clear(sf::Color::Black);
 
+            // Alle Körper zeichnen
             for (const Body& b : bodies) {
                 sf::CircleShape circle(b.mass > 50.0f ? 6 : 2);
                 circle.setFillColor(mass_to_color(b.mass));
@@ -278,7 +291,7 @@ int main() {
             }
         }
         else {
-            //! Set kernel arguments for compute_forces
+            // Kernel-Argumente für compute_forces setzen
             err = clSetKernelArg(compute_forces_kernel, 0, sizeof(cl_mem), &posX_buf);
             checkError(err, "clSetKernelArg (posX_buf)");
             err = clSetKernelArg(compute_forces_kernel, 1, sizeof(cl_mem), &posY_buf);
@@ -296,7 +309,7 @@ int main() {
             err = clSetKernelArg(compute_forces_kernel, 7, sizeof(float), &eps);
             checkError(err, "clSetKernelArg (eps)");
 
-            //! Set kernel arguments for integrate_bodies
+            // Kernel-Argumente für integrate_bodies setzen
             err = clSetKernelArg(integrate_bodies_kernel, 0, sizeof(cl_mem), &posX_buf);
             checkError(err, "clSetKernelArg (posX_buf)");
             err = clSetKernelArg(integrate_bodies_kernel, 1, sizeof(cl_mem), &posY_buf);
@@ -318,7 +331,7 @@ int main() {
             err = clSetKernelArg(integrate_bodies_kernel, 9, sizeof(float), &HEIGHT);
             checkError(err, "clSetKernelArg (HEIGHT)");
 
-            //! Call kernels
+            // Kernel starten: compute_forces und integrate_bodies
             err = clEnqueueNDRangeKernel(queue, compute_forces_kernel, 1, NULL, global_work_size, local_work_size, 0, NULL, NULL);
             checkError(err, "clEnqueueNDRangeKernel (compute_forces)");
             clFinish(queue);
@@ -326,15 +339,16 @@ int main() {
             checkError(err, "clEnqueueNDRangeKernel (integrate_bodies)");
             clFinish(queue);
 
-            //! Read results back
+            // Ergebnisse aus den Puffern lesen
             err = clEnqueueReadBuffer(queue, posX_buf, CL_TRUE, 0, sizeof(float) * N, bodies_soa.posX.data(), 0, NULL, NULL);
             checkError(err, "clEnqueueReadBuffer posX");
             err = clEnqueueReadBuffer(queue, posY_buf, CL_TRUE, 0, sizeof(float) * N, bodies_soa.posY.data(), 0, NULL, NULL);
             checkError(err, "clEnqueueReadBuffer posY");
 
+            // Fenster leeren
             window.clear(sf::Color::Black);
 
-            //! Draw bodies from SOA
+            // Alle Körper zeichnen
             for (size_t i = 0; i < N; ++i) {
                 sf::CircleShape circle(bodies_soa.mass[i] > 50.0f ? 6 : 2);
                 circle.setFillColor(mass_to_color(bodies_soa.mass[i]));
@@ -344,12 +358,13 @@ int main() {
             }
         }
 
-        //! FPS calculation and display
-        float fpsElapsed = fpsClock.restart().asSeconds();
+        // FPS berechnen und anzeigen
+        const float fpsElapsed{fpsClock.restart().asSeconds()};
         lastFPS = 1.0f / fpsElapsed;
         fpsText.setString("FPS: " + std::to_string((int)lastFPS));
         window.draw(fpsText);
     
+        // Fensterinhalt anzeigen
         window.display();
     
         sf::Time frameElapsed = frameClock.getElapsedTime();
@@ -357,7 +372,7 @@ int main() {
         frameClock.restart();
     }
 
-    //! Cleanup OpenCL resources
+    // OpenCL Ressourcen freigeben
     if (!use_scalar_version) {
         clReleaseMemObject(posX_buf);
         clReleaseMemObject(posY_buf);
